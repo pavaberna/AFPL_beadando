@@ -10,6 +10,7 @@
         "phpunit/phpunit": "^10.5"
     },
     "scripts": {
-        "test": "phpunit tests"
+        "test": "phpunit tests",
+        "migrate": "php database/migrate.php"
     }
 }
