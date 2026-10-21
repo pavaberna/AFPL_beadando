@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (lint, formázás, tesztek)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP telepítése
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_sqlite
+          tools: composer:v2
+
+      - name: Composer függőségek gyorsítótára
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Függőségek telepítése
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Linting (PHPStan statikus kódelemzés)
+        run: composer lint
+
+      - name: Formatting (PSR-12 kódformázás ellenőrzése)
+        run: composer format
+
+      - name: Tesztek futtatása
+        run: composer test
+
+  # A frontend elkészültekor (JS lint, formázás és tesztek) ide kerül a következő job.
