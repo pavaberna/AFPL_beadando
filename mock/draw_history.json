@@ -1,0 +1,9 @@
+[
+  { "id": 1, "student_id": 4, "drawn_on": "2026-10-12" },
+  { "id": 2, "student_id": 2, "drawn_on": "2026-10-13" },
+  { "id": 3, "student_id": 4, "drawn_on": "2026-10-14" },
+  { "id": 4, "student_id": 7, "drawn_on": "2026-10-13" },
+  { "id": 5, "student_id": 9, "drawn_on": "2026-10-15" },
+  { "id": 6, "student_id": 5, "drawn_on": "2026-10-16" },
+  { "id": 7, "student_id": 11, "drawn_on": "2026-10-14" }
+]

@@ -1,0 +1,6 @@
+[
+  { "id": 1, "name": "9.A", "teacher_id": 2, "created_at": "2026-09-01 09:00:00" },
+  { "id": 2, "name": "10.B", "teacher_id": 2, "created_at": "2026-09-01 09:01:00" },
+  { "id": 3, "name": "11.C", "teacher_id": 3, "created_at": "2026-09-01 09:02:00" },
+  { "id": 4, "name": "12.D", "teacher_id": null, "created_at": "2026-09-01 09:03:00" }
+]
