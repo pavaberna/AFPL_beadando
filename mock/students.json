@@ -1,0 +1,100 @@
+[
+  {
+    "id": 1,
+    "class_id": 1,
+    "name": "Kasza Blanka",
+    "weight": 10,
+    "created_at": "2026-09-01 09:10:00"
+  },
+  {
+    "id": 2,
+    "class_id": 1,
+    "name": "Zsíros B. Ödön",
+    "weight": 4,
+    "created_at": "2026-09-01 09:10:00"
+  },
+  {
+    "id": 3,
+    "class_id": 1,
+    "name": "Tök Ödön",
+    "weight": 10,
+    "created_at": "2026-09-01 09:10:00"
+  },
+  {
+    "id": 4,
+    "class_id": 1,
+    "name": "Agyalá Gyula",
+    "weight": 1,
+    "created_at": "2026-09-01 09:10:00"
+  },
+  {
+    "id": 5,
+    "class_id": 1,
+    "name": "Gipsz Elek",
+    "weight": 7,
+    "created_at": "2026-09-01 09:10:00"
+  },
+  {
+    "id": 6,
+    "class_id": 2,
+    "name": "Para Zita",
+    "weight": 10,
+    "created_at": "2026-09-01 09:11:00"
+  },
+  {
+    "id": 7,
+    "class_id": 2,
+    "name": "Techno Kolos",
+    "weight": 3,
+    "created_at": "2026-09-01 09:11:00"
+  },
+  {
+    "id": 8,
+    "class_id": 2,
+    "name": "Trab Antal",
+    "weight": 10,
+    "created_at": "2026-09-01 09:11:00"
+  },
+  {
+    "id": 9,
+    "class_id": 2,
+    "name": "Víz Elek",
+    "weight": 6,
+    "created_at": "2026-09-01 09:11:00"
+  },
+  {
+    "id": 10,
+    "class_id": 3,
+    "name": "Zsákos Frodó",
+    "weight": 10,
+    "created_at": "2026-09-01 09:12:00"
+  },
+  {
+    "id": 11,
+    "class_id": 3,
+    "name": "Pop Simon",
+    "weight": 5,
+    "created_at": "2026-09-01 09:12:00"
+  },
+  {
+    "id": 12,
+    "class_id": 3,
+    "name": "Szalmon Ella",
+    "weight": 10,
+    "created_at": "2026-09-01 09:12:00"
+  },
+  {
+    "id": 13,
+    "class_id": 4,
+    "name": "Major Anna",
+    "weight": 10,
+    "created_at": "2026-09-01 09:13:00"
+  },
+  {
+    "id": 14,
+    "class_id": 4,
+    "name": "Bármi Áron",
+    "weight": 10,
+    "created_at": "2026-09-01 09:13:00"
+  }
+]
