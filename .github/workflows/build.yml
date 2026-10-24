@@ -42,4 +42,37 @@ jobs:
       - name: Tesztek futtatása
         run: composer test
 
-  # A frontend elkészültekor (JS lint, formázás és tesztek) ide kerül a következő job.
+  frontend:
+    name: Frontend (JavaScript és JSON ellenőrzés)
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Projekt letöltése
+        uses: actions/checkout@v4
+
+      - name: Node.js beállítása
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: JavaScript szintaxis ellenőrzése
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            echo "Ellenőrzés: $file"
+            node --check "$file"
+          done < <(find frontend/js -type f -name '*.js' -print0)
+
+      - name: Menü JSON ellenőrzése
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+          const file = "frontend/partials/menus.json";
+
+          JSON.parse(fs.readFileSync(file, "utf8"));
+          console.log(`${file}: érvényes JSON`);
+          NODE

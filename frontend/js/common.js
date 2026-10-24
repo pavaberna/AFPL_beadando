@@ -30,6 +30,11 @@ async function kozosReszekBetoltese() {
         // Ezután a JSON alapján elkészítjük a menüt.
         await menuBetoltese();
 
+         // Megjelenítjük a bejelentkezett felhasználó nevét, a már belépett
+        if (typeof belepesiAllapotFrissitese === "function") {
+            await belepesiAllapotFrissitese();
+        }
+
         // Jelezzük, hogy a menü elemei már használhatók.
         document.dispatchEvent(new Event("menu-betoltve"));
     } catch (hiba) {

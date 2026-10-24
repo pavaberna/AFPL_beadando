@@ -19,6 +19,9 @@
 
     --shadow-box: 1px 1px 10px var(--color-text);
 }
+[hidden] {
+    display: none !important;
+}
 * {
     box-sizing: border-box;
 }
