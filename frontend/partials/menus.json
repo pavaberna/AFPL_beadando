@@ -1,0 +1,23 @@
+{
+    "index": [
+        {
+            "tipus": "gomb",
+            "szoveg": "Bejelentkezés",
+            "id": "bejelentkezes"
+        }
+    ],
+    "tanar": [
+        {
+            "tipus": "gomb",
+            "szoveg": "Kijelentkezés",
+            "id": "kijelentkezes"
+        }
+    ],
+    "admin": [
+        {
+            "tipus": "gomb",
+            "szoveg": "Kijelentkezés",
+            "id": "kijelentkezes"
+        }
+    ]
+}

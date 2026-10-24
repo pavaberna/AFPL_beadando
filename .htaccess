@@ -7,4 +7,4 @@ RewriteRule ^$ frontend/index.html [END]
 RewriteRule ^(index|admin|tanar)\.html$ frontend/$1.html [END]
 
 # A frontendhez tartozó fájlok
-RewriteRule ^(css|js|images|partials)/(.*)$ frontend/$1/$2 [END]
+RewriteRule ^(css|js|img|partials)/(.*)$ frontend/$1/$2 [END]

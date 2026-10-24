@@ -1,0 +1,67 @@
+:root {
+    --color-background: #F1F1F1;
+    --color-text: #20354B;
+
+    --color-primary: #87CEEB;
+    --color-on-primary: #20354B;
+
+    --color-border: #607D8B;
+    --color-success: #287568;
+    --color-danger: #B84A3A;
+
+    --border-thin: 1px solid var(--color-border); 
+
+    --font-normal: 400;
+    --font-bold: 700;
+
+    --logo-width: 100px;
+    --icon-width: 25px;
+
+    --shadow-box: 1px 1px 10px var(--color-text);
+}
+* {
+    box-sizing: border-box;
+}
+body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+nav {
+    background-color: var(--color-text);
+    color: var(--color-background);
+}
+a {
+    text-decoration: none;
+}
+button, a.btn {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+button:hover, a.btn:hover {
+    cursor: pointer;
+}
+button.btn-icon {
+    background: transparent;
+    border:none;
+}
+.card {
+    border: var(--border-thin);
+}
+.logo {
+    width: var(--logo-width);
+}
+.icon {
+    width: var(--icon-width);
+}
+footer {
+    background-color: var(--color-text);
+    color: var(--color-background);
+}
+/* -- form -- */
+
+label, input {
+    display: block;
+}
