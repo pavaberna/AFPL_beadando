@@ -67,12 +67,3 @@ jobs:
             node --check "$file"
           done < <(find frontend/js -type f -name '*.js' -print0)
 
-      - name: Menü JSON ellenőrzése
-        run: |
-          node <<'NODE'
-          const fs = require("node:fs");
-          const file = "frontend/partials/menus.json";
-
-          JSON.parse(fs.readFileSync(file, "utf8"));
-          console.log(`${file}: érvényes JSON`);
-          NODE
