@@ -21,7 +21,7 @@ async function belepesiAllapotFrissitese() {
 
         const data = await response.json();
 
-        hely.textContent = `Belépve, mint ${data.user.username}`;
+        hely.textContent = data.user.username;
     } catch (error) {
         hely.textContent = "A belépési állapot nem tölthető be.";
         console.error(error);
@@ -89,3 +89,4 @@ async function belepesEllenorzese() {
 
 // Oldalbetöltéskor lefuttatjuk.
 belepesEllenorzese();
+belepesiAllapotFrissitese();

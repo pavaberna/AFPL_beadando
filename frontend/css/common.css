@@ -1,70 +1,155 @@
 :root {
     --color-background: #F1F1F1;
-    --color-text: #20354B;
-
+    --color-text: #20354b;
     --color-primary: #87CEEB;
     --color-on-primary: #20354B;
-
     --color-border: #607D8B;
     --color-success: #287568;
     --color-danger: #B84A3A;
+    --color-shadow: #20354b80;
 
     --border-thin: 1px solid var(--color-border); 
+    --border-bold: 3px var(--color-border) ridge;
+    --border-bold-color: 3px var(--color-primary) ridge;
 
     --font-normal: 400;
     --font-bold: 700;
 
     --logo-width: 100px;
-    --icon-width: 25px;
+    --icon-width: 30px;
 
-    --shadow-box: 1px 1px 10px var(--color-text);
+    --shadow-box: 0 10px 28px var(--color-shadow);
+    --radius: 10px;
+    --gap: 24px;
 }
-[hidden] {
-    display: none !important;
-}
+
+/* általános */
+
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html {
+    scroll-behavior: smooth;
 }
 body {
     background-color: var(--color-background);
     color: var(--color-text);
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
     line-height: 1.5;
 }
-nav {
-    background-color: var(--color-text);
-    color: var(--color-background);
+main {
+    padding: 50px 0;
+    background-color: var(--color-background);
 }
 a {
     text-decoration: none;
+    font-variant: small-caps;
 }
-button, a.btn {
-    background-color: var(--color-primary);
-    color: var(--color-on-primary);
+button {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 10px 20px;
+  border: var(--border-thin);
+  border-radius: var(--radius);
+  font-weight: var(--font-bold);
 }
-button:hover, a.btn:hover {
-    cursor: pointer;
+button:hover {
+  background-color: var(--color-text);
+  color: var(--color-background);
+  cursor: pointer;
 }
-button.btn-icon {
+button.btn-img {
     background: transparent;
     border:none;
+    padding: 5px;
 }
-.card {
-    border: var(--border-thin);
-}
-.logo {
-    width: var(--logo-width);
+.container {
+    width: 95%;
+    max-width: 800px;
+    margin: auto;
 }
 .icon {
     width: var(--icon-width);
+    vertical-align: middle;
 }
-footer {
+.logo {
+    width: var(--logo-width);
+    vertical-align: middle;
+}
+.flex-y {
+    display:flex;
+    flex-direction: column;
+}
+.flex-x {
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+}
+.card {
+    box-shadow: var(--shadow-box);
+    border-radius: var(--radius);
+    margin: 30px auto;
+    border: var(--border-bold);
+    padding: 30px;
+}
+[hidden] {
+    display: none !important;
+}
+
+
+/* fejrész */
+
+#top-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#top-nav {
     background-color: var(--color-text);
     color: var(--color-background);
 }
-/* -- form -- */
+#top-nav .flex-x {
+    justify-content: space-between;
+}
+#top-nav a {
+    padding: 5px 15px 5px 0;
+    color: var(--color-background);
+}
+#top-nav a:hover {
+    color: var(--color-primary);
+}
+#belepesi-allapot {
+    padding: 0 10px 0 5px;
+}
 
-label, input {
-    display: block;
+/* lábléc */
+
+footer { 
+    text-align: center;
+    padding: 50px 0 50px 0;
+}
+
+/* form */
+form {
+    max-width: 400px;
+}
+.message {
+    border-radius: var(--radius);
+    border-left: var(--border-bold-color);
+    margin-bottom: 20px;
+    padding:10px;
+}
+form label {
+    margin-left: 10px;
+    margin-top: 10px;
+}
+input, select {
+  border: var(--border-thin);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+form button {
+    margin-top:30px;
 }
