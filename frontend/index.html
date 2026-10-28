@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diáksorsoló</title>
+    <link rel="icon" href="img/favicon.ico">
+    <link rel="stylesheet" href="css/common.css">
+
+    <script src="js/login.js" defer></script>
+</head>
+
+<body data-oldal="index">
+    <header id="top-header">
+        <div class="container flex-x">
+            <img class="logo" alt="Diáksorsoló logó" src="img/logo-sotet.svg">            
+            <h1>Diáksorsoló</h1>
+        </div>
+    </header>
+    <div id="top-nav">
+        <div class="container flex-x">
+            <nav>
+                Az oldal használatához be kell jelentkezni!
+            </nav>
+            <button class="btn-img"><img class="icon" src="img/padlock.png" alt="padlock"></button>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <form id="bejelentkezes" class="card flex-y" autocomplete="off">
+                <label for="username">Felhasználónév</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    required
+                >
+                <label for="password">Jelszó</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                >
+                <button class="btn" type="submit">Bejelentkezés</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>Diáksorsoló – AFPL I. projekt</p>
+    </footer>
+</body>
+</html>
