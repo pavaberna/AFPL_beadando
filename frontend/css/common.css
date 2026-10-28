@@ -21,6 +21,7 @@
     --shadow-box: 0 10px 28px var(--color-shadow);
     --radius: 10px;
     --gap: 24px;
+    --line-height: 24px;
 }
 
 /* általános */
@@ -86,6 +87,7 @@ button.btn-img {
     display:flex;
     flex-direction: row;
     align-items: center;
+    gap: var(--gap);
 }
 .card {
     box-shadow: var(--shadow-box);
@@ -113,11 +115,15 @@ button.btn-img {
 #top-nav .flex-x {
     justify-content: space-between;
 }
-#top-nav a {
-    padding: 5px 15px 5px 0;
+#top-nav button {
     color: var(--color-background);
+    padding: 5px 15px 5px 0px;
+    border:none;
+    background: transparent;
+    font: inherit;
+    font-variant: small-caps;
 }
-#top-nav a:hover {
+#top-nav button:hover {
     color: var(--color-primary);
 }
 #belepesi-allapot {
