@@ -39,6 +39,18 @@ function jsonRequestBody(): array
     return is_array($data) ? $data : [];
 }
 
+// Csak bejelentkezett tanárnak enged tovább: 401, ha nincs belépve, 403, ha nem tanár.
+function requireTeacher(): void
+{
+    if (currentUser() === null) {
+        jsonResponse(401, ['error' => 'Nincs bejelentkezve']);
+    }
+
+    if (!isAuthorized('teacher')) {
+        jsonResponse(403, ['error' => 'Ehhez a művelethez tanári jogosultság kell']);
+    }
+}
+
 function requireMethod(string $method): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== $method) {
