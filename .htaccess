@@ -1,3 +1,9 @@
+# Az ErrorDocument csak a teljes útvonal megadásával működik 
+# Helyben:       http://localhost/AFPL_beadando/
+# Teszteléskor:  http://localhost:8080/AFPL_beadando/
+
+ErrorDocument 404 /AFPL_beadando/frontend/404.html
+
 RewriteEngine On
 
 # Kezdőoldal

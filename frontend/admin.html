@@ -6,8 +6,10 @@
     <title>Diáksorsoló</title>
     <link rel="icon" href="img/favicon.ico">
     <link rel="stylesheet" href="css/common.css">
-
+    <script src="js/api.js" defer></script>
     <script src="js/auth.js?v=2" defer></script>
+    <script src="js/admin.js" defer></script>
+
 </head>
 
 <body data-oldal="admin">
@@ -20,9 +22,9 @@
     <div id="top-nav">
         <div class="container flex-x">
             <nav>
-                <button class="menu-item">Tanárok</button>
-                <button class="menu-item">Osztályok</button>
-                <button class="menu-item">Diakok</button>
+                <button class="menu-item" id="tanarok-gomb" data-nezet="tanarok">Tanárok</button>
+                <button class="menu-item" id="osztalyok-gomb" data-nezet="osztalyok">Osztályok</button>
+                <button class="menu-item" id="diakok-gomb" data-nezet="diakok">Diakok</button>
             </nav>
             <div>
                 <img class="icon" src="img/id-card.png" alt="in-card">
@@ -34,12 +36,10 @@
 
     <main id="vedett-tartalom" hidden>
         <div class="container">
-            
-            <div class="flex-x">
-                <button >Tanárok</button>
-                <button >Osztályok</button>
-                <button >Diakok</button>
-
+            <div id="admin-tartalom">
+                <h2>Admin Dashboard</h2>
+                <p>
+                ✔ Bejelentkezett adminisztrátori jogosultsággal ✘</p>
             </div>
         </div>
     </main>
