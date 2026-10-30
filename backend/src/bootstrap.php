@@ -39,6 +39,18 @@ function jsonRequestBody(): array
     return is_array($data) ? $data : [];
 }
 
+// Csak bejelentkezett adminnak enged tovább: 401, ha nincs belépve, 403, ha nem admin.
+function requireAdmin(): void
+{
+    if (currentUser() === null) {
+        jsonResponse(401, ['error' => 'Nincs bejelentkezve']);
+    }
+
+    if (!isAuthorized('admin')) {
+        jsonResponse(403, ['error' => 'Ehhez a művelethez admin jogosultság kell']);
+    }
+}
+
 // Csak bejelentkezett tanárnak enged tovább: 401, ha nincs belépve, 403, ha nem tanár.
 function requireTeacher(): void
 {

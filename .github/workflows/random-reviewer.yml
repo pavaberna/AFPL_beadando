@@ -1,0 +1,36 @@
+name: Véletlenszerű reviewer
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  assign:
+    name: Reviewer kisorsolása
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Reviewer kiosztása
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          CSAPAT: "pavaberna info-Nytta Dabe-git"
+        run: |
+          jeloltek=()
+          for tag in $CSAPAT; do
+            [ "$tag" != "$AUTHOR" ] && jeloltek+=("$tag")
+          done
+
+          if [ ${#jeloltek[@]} -eq 0 ]; then
+            echo "Nincs lehetséges reviewer."
+            exit 0
+          fi
+
+          kivalasztott=${jeloltek[RANDOM % ${#jeloltek[@]}]}
+          echo "Reviewer: $kivalasztott"
+          gh pr edit "$PR_NUMBER" --add-reviewer "$kivalasztott" --repo "${{ github.repository }}"
