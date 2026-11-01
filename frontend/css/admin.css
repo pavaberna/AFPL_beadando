@@ -1,0 +1,17 @@
+ 
+#tanarok-szama, #osztalyok-szama {
+    display: block;
+    font-size: large;
+    font-weight: bold;
+    text-align: center;
+}
+.admin-card {
+    margin:0;
+    text-align: center;
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content:space-between;
+    gap: var(--gap);
+}
