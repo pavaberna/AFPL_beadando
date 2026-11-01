@@ -51,10 +51,23 @@ function requireAdmin(): void
     }
 }
 
-function requireMethod(string $method): void
+// Csak bejelentkezett tanárnak enged tovább: 401, ha nincs belépve, 403, ha nem tanár.
+function requireTeacher(): void
 {
-    if ($_SERVER['REQUEST_METHOD'] !== $method) {
-        header('Allow: ' . $method);
+    if (currentUser() === null) {
+        jsonResponse(401, ['error' => 'Nincs bejelentkezve']);
+    }
+
+    if (!isAuthorized('teacher')) {
+        jsonResponse(403, ['error' => 'Ehhez a művelethez tanári jogosultság kell']);
+    }
+}
+
+// Csak a megadott HTTP metódusok egyikét engedi tovább, különben 405.
+function requireMethod(string ...$methods): void
+{
+    if (!in_array($_SERVER['REQUEST_METHOD'], $methods, true)) {
+        header('Allow: ' . implode(', ', $methods));
         jsonResponse(405, ['error' => 'Nem engedélyezett metódus']);
     }
 }

@@ -89,6 +89,29 @@ function createStudent(PDO $db, int $classId, string $name): array
     return normalizeRow($stmt->fetch(PDO::FETCH_ASSOC));
 }
 
+// Az összes tanár (az adminok nélkül) név szerint rendezve.
+function listTeachers(PDO $db): array
+{
+    $stmt = $db->query(
+        "SELECT id, username, display_name, role, created_at FROM users WHERE role = 'teacher' ORDER BY display_name"
+    );
+
+    return array_map('normalizeRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+// Az összes osztály név szerint rendezve, a hozzárendelt tanár nevével (null, ha nincs tanára).
+function listClasses(PDO $db): array
+{
+    $stmt = $db->query(
+        'SELECT c.id, c.name, c.teacher_id, u.display_name AS teacher_name, c.created_at
+        FROM classes c
+        LEFT JOIN users u ON u.id = c.teacher_id
+        ORDER BY c.name'
+    );
+
+    return array_map('normalizeRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
 // Az SQLite szövegként adja az azonosítókat és a számokat, ezeket egész számmá alakítjuk.
 function normalizeRow(array|false $row): array
 {
