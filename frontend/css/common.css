@@ -58,16 +58,19 @@ button {
   border: var(--border-thin);
   border-radius: var(--radius);
   font-weight: var(--font-bold);
+  cursor: pointer;
 }
 button:hover {
   background-color: var(--color-text);
   color: var(--color-background);
-  cursor: pointer;
 }
 button.btn-img {
     background: transparent;
     border:none;
     padding: 5px;
+}
+button.btn-img:hover img {
+    filter: drop-shadow(0 0 5px black);
 }
 .container {
     width: 95%;

@@ -39,13 +39,116 @@
     <main id="vedett-tartalom" hidden>
         <div class="container">
             <div id="admin-tartalom">
-                <h2>Admin Dashboard</h2>
-
-                <div class="grid-2">
-                    <p class="card admin-card">Tanárok<strong id="tanarok-szama">Betöltés…</strong></p>
-                    <p class="card admin-card">Osztályok<strong id="osztalyok-szama">Betöltés…</strong></p>
-                </div>
+                Admin jogosultsággal bejelentkezve
             </div>
+
+            <dialog id="tanar-dialog" aria-labelledby="tanar-dialog-cim">
+                <h2 id="tanar-dialog-cim">Új tanár felvétele</h2>
+
+                <form id="tanar-urlap" autocomplete="off">
+                    <p>
+                        <label for="tanar-username">Felhasználónév</label>
+                        <input
+                            type="text"
+                            id="tanar-username"
+                            name="username"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p>
+                        <label for="tanar-display-name">Név</label>
+                        <input
+                            type="text"
+                            id="tanar-display-name"
+                            name="display_name"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p>
+                        <label for="tanar-password">Jelszó</label>
+                        <input
+                            type="password"
+                            id="tanar-password"
+                            name="password"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </p>
+
+                    <p id="tanar-urlap-hiba" role="alert"></p>
+
+                    <div class="urlap-gombok">
+                        <button type="button" id="tanar-megse">Mégse</button>
+                        <button type="submit">Mentés</button>
+                    </div>
+                </form>
+            </dialog>
+
+            <dialog id="osztaly-dialog" aria-labelledby="osztaly-dialog-cim">
+                <h2 id="osztaly-dialog-cim">Új osztály felvétele</h2>
+
+                <form id="osztaly-urlap" autocomplete="off">
+                    <p>
+                        <label for="osztaly-name">Osztály neve</label>
+                        <input
+                            type="text"
+                            id="osztaly-name"
+                            name="name"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p>
+                        <label for="osztaly-teacher">Tanár</label>
+                        <select id="osztaly-teacher" name="teacher_id">
+                            <option value="">Nincs hozzárendelt tanár</option>
+                        </select>
+                    </p>
+
+                    <p id="osztaly-urlap-hiba" role="alert"></p>
+
+                    <div class="urlap-gombok">
+                        <button type="button" id="osztaly-megse">Mégse</button>
+                        <button type="submit">Mentés</button>
+                    </div>
+                </form>
+            </dialog>
+
+            <dialog id="diak-dialog" aria-labelledby="diak-dialog-cim">
+                <h2 id="diak-dialog-cim">Új diák felvétele</h2>
+
+                <p>
+                    Osztály:
+                    <strong id="diak-osztaly-nev"></strong>
+                </p>
+
+                <form id="diak-urlap" autocomplete="off">
+                    <p>
+                        <label for="diak-name">Diák neve</label>
+                        <input
+                            type="text"
+                            id="diak-name"
+                            name="name"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p id="diak-urlap-hiba" role="alert"></p>
+
+                    <div class="urlap-gombok">
+                        <button type="button" id="diak-megse">Mégse</button>
+                        <button type="submit">Mentés</button>
+                    </div>
+                </form>
+            </dialog>
+
+
         </div>
     </main>
 

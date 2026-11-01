@@ -3,6 +3,10 @@ import {
     osztalyokLekerese
 } from "./admin/adatok.js";
 
+import { dashboardTartalma } from "./admin/dashboard.js";
+import { tanarokTartalma } from "./admin/tanarok.js";
+import { osztalyokTartalma } from "./admin/osztalyok.js";
+import "./admin/diakok.js";
 
 // Az egyes menüpontokhoz tartozó műveletek.
 const nezetek = {
@@ -79,29 +83,6 @@ async function nezetMegnyitasa(nezetNev) {
         nezetGombokTiltasa(false);
     }
 }
-
-
-// FELDOLGOZÁS ÉS MEGJELENÍTÉS
-// Egyelőre csak kiírjuk az adatokat a konzolra.
-// Később ezek a függvények külön fájlokba kerülnek.
-
-function dashboardTartalma(adatok) {
-    // IDE KERÜL a dashboard egyedi megjelenítése.
-    console.log("Dashboard feldolgozása:", adatok);
-}
-
-
-function osztalyokTartalma(osztalyok) {
-    // IDE KERÜL az osztályok egyedi megjelenítése.
-    console.log("Osztályok feldolgozása:", osztalyok);
-}
-
-
-function tanarokTartalma(tanarok) {
-    // IDE KERÜL a tanárok egyedi megjelenítése.
-    console.log("Tanárok feldolgozása:", tanarok);
-}
-
 
 // A később betöltött menügombokat is kezeli.
 document.addEventListener("click", event => {
