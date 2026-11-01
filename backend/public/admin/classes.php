@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 
+// GET  /admin/classes.php - az összes osztály listája a hozzárendelt tanár nevével
 // POST /admin/classes.php  {"name": "...", "teacher_id": 2}  (a teacher_id elhagyható vagy null)
 
 require_once __DIR__ . '/../../src/bootstrap.php';
 require_once __DIR__ . '/../../src/admin.php';
 
-requireMethod('POST');
+requireMethod('GET', 'POST');
 requireAdmin();
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    jsonResponse(200, ['classes' => listClasses(getDb())]);
+}
 
 $body = jsonRequestBody();
 $name = cleanString($body['name'] ?? null);
