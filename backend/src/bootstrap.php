@@ -63,10 +63,11 @@ function requireTeacher(): void
     }
 }
 
-function requireMethod(string $method): void
+// Csak a megadott HTTP metódusok egyikét engedi tovább, különben 405.
+function requireMethod(string ...$methods): void
 {
-    if ($_SERVER['REQUEST_METHOD'] !== $method) {
-        header('Allow: ' . $method);
+    if (!in_array($_SERVER['REQUEST_METHOD'], $methods, true)) {
+        header('Allow: ' . implode(', ', $methods));
         jsonResponse(405, ['error' => 'Nem engedélyezett metódus']);
     }
 }
