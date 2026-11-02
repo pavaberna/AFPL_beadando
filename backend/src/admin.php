@@ -89,6 +89,88 @@ function createStudent(PDO $db, int $classId, string $name): array
     return normalizeRow($stmt->fetch(PDO::FETCH_ASSOC));
 }
 
+// A CSV tartalmából kiolvassa a diákok neveit. Az első sor a fejléc, ebben kell lennie egy
+// nev, név vagy name oszlopnak; az elválasztó ; vagy , lehet. Hibás fájlnál kivételt dob.
+function parseStudentCsv(string $content): array
+{
+    if (str_starts_with($content, "\xEF\xBB\xBF")) {
+        $content = substr($content, 3);
+    }
+
+    // Érvénytelen UTF-8 szövegre a /u módú preg_match false értéket ad.
+    if (preg_match('//u', $content) !== 1) {
+        throw new InvalidArgumentException('A fájl nem UTF-8 kódolású (Excelben: "CSV UTF-8" mentés)');
+    }
+
+    $lines = explode("\n", str_replace(["\r\n", "\r"], "\n", $content));
+    $separator = str_contains($lines[0], ';') ? ';' : ',';
+    $columns = array_map(
+        fn (?string $cell): string => strtolower(trim((string) $cell)),
+        str_getcsv($lines[0], $separator, '"', '')
+    );
+    $nameColumn = array_key_first(array_intersect($columns, ['nev', 'név', 'name']));
+
+    if ($nameColumn === null) {
+        throw new InvalidArgumentException('A fájl első sorában kell lennie nev vagy name oszlopnak');
+    }
+
+    $names = [];
+
+    foreach (array_slice($lines, 1, null, true) as $index => $line) {
+        $cells = str_getcsv($line, $separator, '"', '');
+        $name = cleanString($cells[$nameColumn] ?? null);
+        $row = $index + 1;
+
+        // Több cella a fejlécnél: a névben idézőjel nélküli elválasztó van, ezért csonkulna.
+        if (count($cells) > count($columns)) {
+            throw new InvalidArgumentException("A(z) $row. sorban több oszlop van, mint a fejlécben");
+        }
+
+        if ($name !== null) {
+            $names[] = $name;
+        } elseif (trim(implode('', $cells)) !== '') {
+            throw new InvalidArgumentException("A(z) $row. sorból hiányzik a név");
+        }
+    }
+
+    if ($names === []) {
+        throw new InvalidArgumentException('A fájl nem tartalmaz diákot');
+    }
+
+    return $names;
+}
+
+// Diákok tömeges felvétele egy osztályba: vagy mindegyik bekerül, vagy egyik sem. Az osztályban
+// már szereplő és a listában ismétlődő nevek kimaradnak. Az osztály létezését a hívó ellenőrzi.
+function importStudents(PDO $db, int $classId, array $names): array
+{
+    $stmt = $db->prepare('SELECT name FROM students WHERE class_id = ?');
+    $stmt->execute([$classId]);
+    $known = array_fill_keys($stmt->fetchAll(PDO::FETCH_COLUMN), true);
+    $result = ['imported' => [], 'skipped' => []];
+
+    $db->beginTransaction();
+
+    try {
+        foreach ($names as $name) {
+            if (isset($known[$name])) {
+                $result['skipped'][] = $name;
+                continue;
+            }
+
+            $result['imported'][] = createStudent($db, $classId, $name);
+            $known[$name] = true;
+        }
+
+        $db->commit();
+    } catch (Throwable $e) {
+        $db->rollBack();
+        throw $e;
+    }
+
+    return $result;
+}
+
 // Az összes tanár (az adminok nélkül) név szerint rendezve.
 function listTeachers(PDO $db): array
 {
