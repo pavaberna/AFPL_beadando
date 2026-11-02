@@ -1,0 +1,54 @@
+body[data-oldal="tanar"] #top-nav details {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+body[data-oldal="tanar"] #top-nav summary {
+    display:flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+#top-nav .lenyilo-menu {
+    position: absolute;
+    top: 35px;
+    left: -15px;
+    z-index: 10;
+    background-color: var(--color-text);
+}
+#top-nav .lenyilo-menu button{
+    border-radius: 0;
+    padding: 10px 20px;
+    width: max-content;
+    font-weight: normal;
+    font-size: 80%;
+}
+
+.osztaly-gombok.flex-x {
+    justify-content: flex-start;
+}
+button.card {
+    margin: 0;
+}
+
+
+.nevsor-fejlec {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+}
+
+.nevsor-fejlec h2,
+.nevsor-fejlec > div > p {
+    margin: 0;
+}
+
+button.modositas:disabled {
+    opacity: 0.5;
+    cursor: inherit;
+    background-color: inherit;
+    color:inherit;
+}

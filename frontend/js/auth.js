@@ -4,12 +4,19 @@ async function belepesiAllapotFrissitese() {
 
     if (!hely) return;
 
+    const datumHelye = document.getElementById("aktualis-datum");
+
+    if (datumHelye) {
+        const { datumFormazasa } = await import("./datum.js");
+        datumHelye.textContent = datumFormazasa(new Date());
+    }
+
     await apiRequest({
         url: "backend/public/me.php",
         cache: "no-store",
 
         onSuccess: (data) => {
-            hely.textContent = data.user.username;
+            hely.textContent = data.user.display_name;
         },
 
         onError: (error) => {
@@ -27,7 +34,7 @@ async function belepesiAllapotFrissitese() {
 
 // A később betöltött fejlécben lévő gombot is kezeli.
 document.addEventListener("click", async (event) => {
-    const gomb = event.target.closest("#kijelentkezes");
+    const gomb = event.target.closest('#kijelentkezes, [data-muvelet="kijelentkezes"]');
 
     if (!gomb || gomb.disabled) return;
 
@@ -63,9 +70,27 @@ async function belepesEllenorzese() {
         url: "backend/public/me.php",
         cache: "no-store",
 
-        onSuccess: () => {
-            // Sikeres ellenőrzés után megmutatjuk a tartalmat.
+        onSuccess: async (data) => {
+            const tanariOldal = document.body.dataset.oldal === "tanar";
+
+            if (tanariOldal && data.user.role !== "teacher") {
+                alert("Ez az oldal csak tanárként érhető el.");
+                window.location.replace("index.html");
+                return;
+            }
+
             tartalom.hidden = false;
+
+            if (tanariOldal) {
+                try {
+                    const { tanariFeluletInditasa } = await import("./tanar.js");
+                    await tanariFeluletInditasa();
+                } catch (hiba) {
+                    document.getElementById("tanar-tartalom").textContent =
+                        "A tanári felületet nem sikerült betölteni.";
+                    console.error(hiba);
+                }
+            }
         },
 
         onError: (error) => {

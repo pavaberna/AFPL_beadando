@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diáksorsoló</title>
-    <link rel="icon" href="img/favicon.ico">
-    <link rel="stylesheet" href="css/common.css">
-    <script src="js/api.js" defer></script>
-    <script src="js/auth.js?v=2" defer></script>
+    <link rel="icon" href="./img/favicon.ico">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/tanar.css">
+    
+    <script src="./js/api.js" defer></script>
+    <script src="./js/auth.js" defer></script>
 </head>
 
 <body data-oldal="tanar">
@@ -20,22 +22,33 @@
     <div id="top-nav">
         <div class="container flex-x">
             <nav>
-                <a href="#">Osztályok</a>
-                <a href="#">Hiányzók</a>
-                <a href="#">Pörgetések</a>
+                <button class="menu-item" id="osztalyok-gomb" data-nezet="osztalyok">Osztályok</button>
             </nav>
             <div>
-                <img class="icon" src="img/id-card.png" alt="in-card">
-                <span id="belepesi-allapot"></span>
-                <button class="btn-img" id="kijelentkezes" title="Kijelentkezés"><img class="icon" src="img/close.png" alt="close"></button>
+                <time id="aktualis-datum"></time>
+                <details>
+                    <summary>  
+                        <span id="belepesi-allapot"></span>        
+                        <img class="icon" src="img/id-card.png" alt="">
+                    </summary>
+                    <div class="lenyilo-menu">
+                        <button type="button" class="menu-item" id="beallitasok-gomb">
+                            Beállítások
+                        </button>
+                        <button type="button" class="menu-item" data-muvelet="kijelentkezes">
+                            Kijelentkezés
+                        </button>
+                    </div>
+                </details>
             </div>
         </div>
     </div>
 
     <main id="vedett-tartalom" hidden>
         <div class="container">
-        <p id="belepesi-allapot"></p>
-        <p>Tanár felület</p>
+            <div id="tanar-tartalom">
+                Tanári jogosultsággal bejelentkezve
+            </div>
         </div>
     </main>
 
