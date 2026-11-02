@@ -29,6 +29,9 @@ jobs:
       - name: Függőségek telepítése
         run: npm ci
 
+      - name: Dátumformázás tesztelése
+        run: npx playwright test frontend/tests/datum.spec.cjs  
+
       - name: Tesztböngésző telepítése
         run: npx playwright install --with-deps chromium
 
