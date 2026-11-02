@@ -6,8 +6,11 @@
     <title>Diáksorsoló</title>
     <link rel="icon" href="img/favicon.ico">
     <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="./js/api.js" defer></script>
+    <script src="./js/auth.js" defer></script>
+    <script type="module" src="./js/admin.js"></script>
 
-    <script src="js/auth.js?v=2" defer></script>
 </head>
 
 <body data-oldal="admin">
@@ -20,8 +23,10 @@
     <div id="top-nav">
         <div class="container flex-x">
             <nav>
-                <a href="#">Tanárok</a>
-                <a href="#">Osztályok</a>
+                <button class="menu-item" id="dashboard-gomb">Dashboard</button>
+                <button class="menu-item" id="tanarok-gomb" data-nezet="tanarok">Tanárok</button>
+                <button class="menu-item" id="osztalyok-gomb" data-nezet="osztalyok">Osztályok</button>
+
             </nav>
             <div>
                 <img class="icon" src="img/id-card.png" alt="in-card">
@@ -33,8 +38,117 @@
 
     <main id="vedett-tartalom" hidden>
         <div class="container">
-            
-            <p>Admin felület</p>
+            <div id="admin-tartalom">
+                Admin jogosultsággal bejelentkezve
+            </div>
+
+            <dialog id="tanar-dialog" aria-labelledby="tanar-dialog-cim">
+                <h2 id="tanar-dialog-cim">Új tanár felvétele</h2>
+
+                <form id="tanar-urlap" autocomplete="off">
+                    <p>
+                        <label for="tanar-username">Felhasználónév</label>
+                        <input
+                            type="text"
+                            id="tanar-username"
+                            name="username"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p>
+                        <label for="tanar-display-name">Név</label>
+                        <input
+                            type="text"
+                            id="tanar-display-name"
+                            name="display_name"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p>
+                        <label for="tanar-password">Jelszó</label>
+                        <input
+                            type="password"
+                            id="tanar-password"
+                            name="password"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </p>
+
+                    <p id="tanar-urlap-hiba" role="alert"></p>
+
+                    <div class="urlap-gombok">
+                        <button type="button" id="tanar-megse">Mégse</button>
+                        <button type="submit">Mentés</button>
+                    </div>
+                </form>
+            </dialog>
+
+            <dialog id="osztaly-dialog" aria-labelledby="osztaly-dialog-cim">
+                <h2 id="osztaly-dialog-cim">Új osztály felvétele</h2>
+
+                <form id="osztaly-urlap" autocomplete="off">
+                    <p>
+                        <label for="osztaly-name">Osztály neve</label>
+                        <input
+                            type="text"
+                            id="osztaly-name"
+                            name="name"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p>
+                        <label for="osztaly-teacher">Tanár</label>
+                        <select id="osztaly-teacher" name="teacher_id">
+                            <option value="">Nincs hozzárendelt tanár</option>
+                        </select>
+                    </p>
+
+                    <p id="osztaly-urlap-hiba" role="alert"></p>
+
+                    <div class="urlap-gombok">
+                        <button type="button" id="osztaly-megse">Mégse</button>
+                        <button type="submit">Mentés</button>
+                    </div>
+                </form>
+            </dialog>
+
+            <dialog id="diak-dialog" aria-labelledby="diak-dialog-cim">
+                <h2 id="diak-dialog-cim">Új diák felvétele</h2>
+
+                <p>
+                    Osztály:
+                    <strong id="diak-osztaly-nev"></strong>
+                </p>
+
+                <form id="diak-urlap" autocomplete="off">
+                    <p>
+                        <label for="diak-name">Diák neve</label>
+                        <input
+                            type="text"
+                            id="diak-name"
+                            name="name"
+                            autocomplete="off"
+                            required
+                        >
+                    </p>
+
+                    <p id="diak-urlap-hiba" role="alert"></p>
+
+                    <div class="urlap-gombok">
+                        <button type="button" id="diak-megse">Mégse</button>
+                        <button type="submit">Mentés</button>
+                    </div>
+                </form>
+            </dialog>
+
+
         </div>
     </main>
 

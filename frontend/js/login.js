@@ -1,39 +1,42 @@
 const urlap = document.querySelector("#bejelentkezes");
 
+// Sikeres válasz után ezt hívja meg az apiRequest.
+function sikeresBejelentkezes(data) {
+    if (data.user.role === "admin") {
+        window.location.href = "admin.html";
+    } else if (data.user.role === "teacher") {
+        window.location.href = "tanar.html";
+    }
+}
+
+// Hiba esetén ezt hívja meg az apiRequest.
+function sikertelenBejelentkezes(error) {
+    if (error.status) {
+        // A backend hibaválaszt adott.
+        alert(error.message);
+    } else {
+        // Például hálózati hiba vagy feldolgozhatatlan válasz.
+        alert("Nem sikerült feldolgozni a kérést. Próbáld újra!");
+    }
+
+    console.error(error);
+}
+
+// Az űrlap feladata: kiolvasni és elküldeni az adatokat.
 urlap.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    // Kiolvassuk az űrlap mezőinek aktuális tartalmát.
-    const felhasznalonev = document.querySelector("#username").value;
-    const jelszo = document.querySelector("#password").value;
+    const felhasznalonev = urlap.querySelector("#username").value;
+    const jelszo = urlap.querySelector("#password").value;
 
-    try {
-        const response = await fetch("backend/public/login.php", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "same-origin",
-            body: JSON.stringify({
-                username: felhasznalonev,
-                password: jelszo
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            alert(data.error || "Sikertelen bejelentkezés.");
-            return;
-        }
-
-        if (data.user.role === "admin") {
-            window.location.href = "admin.html";
-        } else if (data.user.role === "teacher") {
-            window.location.href = "tanar.html";
-        }
-    } catch (error) {
-        alert("Nem sikerült feldolgozni a kérést. Próbáld újra!");
-        console.error(error);
-    }
+    await apiRequest({
+        url: "backend/public/login.php",
+        method: "POST",
+        data: {
+            username: felhasznalonev,
+            password: jelszo
+        },
+        onSuccess: sikeresBejelentkezes,
+        onError: sikertelenBejelentkezes
+    });
 });

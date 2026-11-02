@@ -1,0 +1,49 @@
+name: Admin felület tesztelése
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  admin-ui:
+    name: Admin böngészős tesztek
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Projekt letöltése
+        uses: actions/checkout@v6
+
+      - name: Node.js beállítása
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Függőségek telepítése
+        run: npm ci
+
+      - name: Tesztböngésző telepítése
+        run: npx playwright install --with-deps chromium
+
+      - name: Admin tesztek futtatása
+        run: npx playwright test --config=playwright.admin.config.cjs
+        env:
+          CI: "true"
+
+      - name: Tesztjelentés mentése
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: admin-tesztjelentes
+          path: |
+            playwright-report-admin/
+            test-results-admin/
+          retention-days: 7
+          if-no-files-found: ignore

@@ -1,0 +1,25 @@
+{
+  "name": "afpl_beadando",
+  "version": "1.0.0",
+  "description": "Ebben a dokumentumban láthatók a backend végpontjai által kért adatok, valamint a visszaadott státuszkódok és JSON válaszok. Hiba esetén a válasz törzse mindig `{ \"error\": \"...\" }` formátumú.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pavaberna/AFPL_beadando.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/pavaberna/AFPL_beadando/issues"
+  },
+  "homepage": "https://github.com/pavaberna/AFPL_beadando#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "http-server": "^14.1.1"
+  }
+}
