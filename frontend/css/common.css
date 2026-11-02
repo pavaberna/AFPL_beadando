@@ -21,6 +21,7 @@
     --shadow-box: 0 10px 28px var(--color-shadow);
     --radius: 10px;
     --gap: 24px;
+    --line-height: 24px;
 }
 
 /* általános */
@@ -40,8 +41,11 @@ body {
     line-height: 1.5;
 }
 main {
-    padding: 50px 0;
+    padding: 25px 0;
     background-color: var(--color-background);
+}
+h2 {
+    padding: 25px 0;
 }
 a {
     text-decoration: none;
@@ -54,16 +58,19 @@ button {
   border: var(--border-thin);
   border-radius: var(--radius);
   font-weight: var(--font-bold);
+  cursor: pointer;
 }
 button:hover {
   background-color: var(--color-text);
   color: var(--color-background);
-  cursor: pointer;
 }
 button.btn-img {
     background: transparent;
     border:none;
     padding: 5px;
+}
+button.btn-img:hover img {
+    filter: drop-shadow(0 0 5px black);
 }
 .container {
     width: 95%;
@@ -86,6 +93,7 @@ button.btn-img {
     display:flex;
     flex-direction: row;
     align-items: center;
+    gap: var(--gap);
 }
 .card {
     box-shadow: var(--shadow-box);
@@ -113,11 +121,15 @@ button.btn-img {
 #top-nav .flex-x {
     justify-content: space-between;
 }
-#top-nav a {
-    padding: 5px 15px 5px 0;
+#top-nav button {
     color: var(--color-background);
+    padding: 5px 15px 5px 0px;
+    border:none;
+    background: transparent;
+    font: inherit;
+    font-variant: small-caps;
 }
-#top-nav a:hover {
+#top-nav button:hover {
     color: var(--color-primary);
 }
 #belepesi-allapot {
