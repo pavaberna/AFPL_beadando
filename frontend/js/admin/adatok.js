@@ -1,3 +1,5 @@
+import { listaLekerese as kozosListaLekerese } from "../lista.js";
+
 // Az útvonalak az oldal URL-jéhez képest értendők.
 const utvonalak = {
     tanarok: "backend/public/admin/teachers.php",
@@ -11,30 +13,12 @@ const adatKeresek = new Map();
 
 
 // Közös lekérés.
-// A listaMezo mondja meg, melyik mezőben érkezik a tömb:
-// például "teachers" vagy "classes".
 function listaLekerese(url, listaMezo) {
     if (!adatKeresek.has(url)) {
-        const keres = apiRequest({
-            url,
-            cache: "no-store"
-        })
-            .then(valasz => {
-                const lista = valasz?.[listaMezo];
-
-                if (!Array.isArray(lista)) {
-                    throw new Error(
-                        `A válasz "${listaMezo}" mezőjében tömböt vártunk.`
-                    );
-                }
-
-                return lista;
-            })
-            .catch(error => {
-                // A hibás kérést nem őrizzük meg.
-                // Így később újra megpróbálható.
+        const keres = kozosListaLekerese(url, listaMezo)
+            .catch(hiba => {
                 adatKeresek.delete(url);
-                throw error;
+                throw hiba;
             });
 
         adatKeresek.set(url, keres);
@@ -42,7 +26,6 @@ function listaLekerese(url, listaMezo) {
 
     return adatKeresek.get(url);
 }
-
 
 // Ezeket a függvényeket használhatják a többi fájlban.
 export function tanarokLekerese() {

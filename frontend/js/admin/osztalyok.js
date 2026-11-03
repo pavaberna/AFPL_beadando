@@ -18,7 +18,7 @@ export function osztalyokTartalma(osztalyok) {
         return `
             <tr>
                 <td>${htmlEscape(osztaly.name)}</td>
-                <td>${htmlEscape(osztaly.teacher_name)}</td>
+                <td>?</td>
                 <td>${htmlEscape(felvetelDatuma)}</td>
 
                 <td>
@@ -57,8 +57,8 @@ export function osztalyokTartalma(osztalyok) {
         <table class="card">
             <thead>
                 <tr>
-                    <th scope="col">Osztály neve</th>
-                    <th scope="col">Tanár neve</th>
+                    <th scope="col">Osztály</th>
+                    <th scope="col">Tanár? Létszám?</th>
                     <th scope="col">Felvéve</th>
                     <th scope="col"></th>
                     <th scope="col">

@@ -102,6 +102,18 @@ button.btn-img:hover img {
     border: var(--border-bold);
     padding: 30px;
 }
+.grid {
+    display: grid;
+    justify-content:space-between;
+    gap: var(--gap);
+}
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+.grid-4 {
+    grid-template-columns: repeat(4,1fr);
+}
+
 [hidden] {
     display: none !important;
 }
@@ -120,6 +132,7 @@ button.btn-img:hover img {
 }
 #top-nav .flex-x {
     justify-content: space-between;
+    align-items: center;
 }
 #top-nav button {
     color: var(--color-background);
@@ -133,7 +146,21 @@ button.btn-img:hover img {
     color: var(--color-primary);
 }
 #belepesi-allapot {
+    height: 40px;
+    line-height: 40px;
     padding: 0 10px 0 5px;
+}
+#top-nav button#kijelentkezes,
+#top-nav button#padlock {
+    padding-right: 0;
+}
+
+/* dátum */
+#aktualis-datum {
+    display: block;
+    text-align: right;
+    font-size: 0.85rem;
+    padding-block: 0.25rem;
 }
 
 /* lábléc */
@@ -164,4 +191,91 @@ input, select {
 }
 form button {
     margin-top:30px;
+}
+
+
+/* táblázat */
+table.card {
+    padding:0;
+    border: var(--border-thin);
+    background-color: white;
+}
+table {
+    border-collapse:separate;
+    border-spacing: 0;
+    width: 100%;
+    border-radius: var(--radius);
+}
+tr:hover td{
+    background-color: var(--color-background);
+}
+th, 
+td {
+    padding: 15px 5px 15px 20px;
+    text-align: left;
+    border-bottom: 2px solid var(--color-border);
+}
+th {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: bold;
+}
+th:first-of-type {
+    border-top-left-radius: var(--radius);
+}
+th:last-of-type {
+    border-top-right-radius: var(--radius);
+}
+tr:last-of-type td {
+    border:none;
+}
+tr:last-of-type td:first-of-type {
+    border-bottom-left-radius: var(--radius);
+}
+tr:last-of-type td:last-of-type {
+    border-bottom-right-radius: var(--radius);
+}
+
+
+/* dialog ablak */
+#porgetes-dialog,
+#tanar-dialog, 
+#osztaly-dialog,
+#diak-dialog {
+    width: min(28rem, 90vw);
+    box-sizing: border-box;
+    padding: 1.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    margin:auto;
+}
+#porgetes-dialog::backdrop,
+#tanar-dialog::backdrop,
+#osztaly-dialog::backdrop,
+#diak-dialog::backdrop {
+    background: rgb(0 0 0 / 50%);
+}
+#porgetes-dialog label,
+#tanar-urlap label,
+#osztaly-urlap label
+#diak-dialog label {
+    display: block;
+    margin-bottom: 0.4rem;
+}
+#porgetes-dialog input,
+#tanar-urlap input,
+#osztaly-urlap input,
+#diak-dialog input {
+    width: 100%;
+    box-sizing: border-box;
+}
+.urlap-gombok {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+.megse {
+    background-color: transparent;
+    color: inherit;
+    border-color: currentColor;
 }

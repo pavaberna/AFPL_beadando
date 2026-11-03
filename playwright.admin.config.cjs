@@ -2,7 +2,7 @@ const { defineConfig } = require("@playwright/test");
 
 module.exports = defineConfig({
     // Itt keressük a frontend tesztjeit.
-    testDir: "./frontend/tests/admin",
+    testDir: "./frontend/tests",
     testMatch: "**/*.spec.cjs",
 
     timeout: 30_000,
