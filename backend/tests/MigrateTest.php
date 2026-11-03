@@ -65,12 +65,58 @@ final class MigrateTest extends TestCase
         $this->assertSame(8, $this->countRows($db, 'SELECT COUNT(*) FROM students'));
     }
 
+    public function testSeedAssignsBothClassesToTheTeacher(): void
+    {
+        $db = migrate($this->dbPath);
+
+        $this->assertSame(2, $this->countRows($db, 'SELECT COUNT(*) FROM teacher_classes'));
+        $this->assertSame(
+            2,
+            $this->countRows(
+                $db,
+                "SELECT COUNT(*) FROM teacher_classes tc
+                JOIN users u ON u.id = tc.teacher_id WHERE u.username = 'tanar'"
+            )
+        );
+    }
+
+    public function testMigrationCopiesLegacyTeacherAssignmentsOnce(): void
+    {
+        $this->makeLegacyDatabase();
+
+        $db = migrate($this->dbPath);
+        $this->assertSame(2, $this->countRows($db, 'SELECT COUNT(*) FROM teacher_classes'));
+
+        $db = migrate($this->dbPath);
+        $this->assertSame(2, $this->countRows($db, 'SELECT COUNT(*) FROM teacher_classes'));
+    }
+
+    public function testMigrationDoesNotRestoreRemovedAssignments(): void
+    {
+        $this->makeLegacyDatabase();
+        $db = migrate($this->dbPath);
+        $db->exec('DELETE FROM teacher_classes WHERE class_id = (SELECT MIN(id) FROM classes)');
+
+        $db = migrate($this->dbPath);
+
+        $this->assertSame(1, $this->countRows($db, 'SELECT COUNT(*) FROM teacher_classes'));
+    }
+
     public function testCliPrintsMigrationFinished(): void
     {
         $script = escapeshellarg(__DIR__ . '/../database/migrate.php');
         $output = shell_exec(escapeshellarg(PHP_BINARY) . " $script " . escapeshellarg($this->dbPath));
 
         $this->assertSame('Migration finished', trim((string) $output));
+    }
+
+    // A kapcsolótábla bevezetése előtti állapot: a tanár az osztály teacher_id oszlopában van.
+    private function makeLegacyDatabase(): void
+    {
+        $db = migrate($this->dbPath);
+        $db->exec('DROP TABLE teacher_classes');
+        $db->exec("UPDATE classes SET teacher_id = (SELECT id FROM users WHERE username = 'tanar')");
+        unset($db);
     }
 
     private function countRows(PDO $db, string $sql): int

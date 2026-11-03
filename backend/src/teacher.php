@@ -7,20 +7,29 @@ declare(strict_types=1);
 // A tanárhoz rendelt osztályok névsor szerint.
 function listTeacherClasses(PDO $db, int $teacherId): array
 {
-    $stmt = $db->prepare('SELECT id, name, created_at FROM classes WHERE teacher_id = ? ORDER BY name');
+    $stmt = $db->prepare(
+        'SELECT c.id, c.name, c.created_at
+        FROM classes c
+        JOIN teacher_classes tc ON tc.class_id = c.id
+        WHERE tc.teacher_id = ?
+        ORDER BY c.name'
+    );
     $stmt->execute([$teacherId]);
 
     return array_map('normalizeTeacherRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
-// Az osztály azonosítója és tanára, vagy null, ha az osztály nem létezik.
-function findClassOwner(PDO $db, int $classId): ?array
+// Igaz, ha a tanárhoz hozzá van rendelve az osztály, hamis, ha nincs; null, ha az osztály nem létezik.
+function teacherHasClass(PDO $db, int $teacherId, int $classId): ?bool
 {
-    $stmt = $db->prepare('SELECT id, teacher_id FROM classes WHERE id = ?');
-    $stmt->execute([$classId]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $db->prepare(
+        'SELECT EXISTS (SELECT 1 FROM teacher_classes WHERE teacher_id = ? AND class_id = ?) AS assigned
+        FROM classes WHERE id = ?'
+    );
+    $stmt->execute([$teacherId, $classId, $classId]);
+    $assigned = $stmt->fetchColumn();
 
-    return $row === false ? null : normalizeTeacherRow($row);
+    return $assigned === false ? null : (bool) $assigned;
 }
 
 // Az osztály diákjai névsor szerint, az utolsó kihúzás dátumával (null, ha még nem húzták ki).

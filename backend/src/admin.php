@@ -64,16 +64,29 @@ function createTeacher(PDO $db, string $username, string $password, string $disp
     return normalizeRow($stmt->fetch(PDO::FETCH_ASSOC));
 }
 
-// Új osztály, opcionálisan tanárhoz rendelve. A név egyediségét és a tanár létezését a hívó ellenőrzi.
+// Új osztály, opcionálisan tanárhoz rendelve (teacher_classes). A név egyediségét és a tanár
+// létezését a hívó ellenőrzi.
 function createClass(PDO $db, string $name, ?int $teacherId): array
 {
-    $stmt = $db->prepare('INSERT INTO classes (name, teacher_id) VALUES (?, ?)');
-    $stmt->execute([$name, $teacherId]);
+    $stmt = $db->prepare('INSERT INTO classes (name) VALUES (?)');
+    $stmt->execute([$name]);
+    $classId = (int) $db->lastInsertId();
 
-    $stmt = $db->prepare('SELECT id, name, teacher_id, created_at FROM classes WHERE id = ?');
-    $stmt->execute([(int) $db->lastInsertId()]);
+    if ($teacherId !== null) {
+        $stmt = $db->prepare('INSERT INTO teacher_classes (teacher_id, class_id) VALUES (?, ?)');
+        $stmt->execute([$teacherId, $classId]);
+    }
 
-    return normalizeRow($stmt->fetch(PDO::FETCH_ASSOC));
+    $stmt = $db->prepare('SELECT id, name, created_at FROM classes WHERE id = ?');
+    $stmt->execute([$classId]);
+    $row = normalizeRow($stmt->fetch(PDO::FETCH_ASSOC));
+
+    return [
+        'id' => $row['id'],
+        'name' => $row['name'],
+        'teacher_id' => $teacherId,
+        'created_at' => $row['created_at'],
+    ];
 }
 
 // Új diák felvétele egy osztályba. A súlyt nem adjuk meg, így az adatbázis alapértelmezett
@@ -181,17 +194,51 @@ function listTeachers(PDO $db): array
     return array_map('normalizeRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
-// Az összes osztály név szerint rendezve, a hozzárendelt tanár nevével (null, ha nincs tanára).
+// Az összes osztály név szerint rendezve. A teachers az osztály összes tanára név szerint. A
+// teacher_id és a teacher_name átmenetileg megmarad a régi felület miatt: a legkorábban felvett
+// hozzárendelt tanár adatai, vagy null, ha az osztálynak nincs tanára.
 function listClasses(PDO $db): array
 {
-    $stmt = $db->query(
-        'SELECT c.id, c.name, c.teacher_id, u.display_name AS teacher_name, c.created_at
-        FROM classes c
-        LEFT JOIN users u ON u.id = c.teacher_id
-        ORDER BY c.name'
+    $teachersByClass = [];
+    $links = $db->query(
+        'SELECT tc.class_id, u.id, u.display_name
+        FROM teacher_classes tc
+        JOIN users u ON u.id = tc.teacher_id
+        ORDER BY u.display_name, u.id'
     );
 
-    return array_map('normalizeRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
+    foreach ($links->fetchAll(PDO::FETCH_ASSOC) as $link) {
+        $teachersByClass[(int) $link['class_id']][] = [
+            'id' => (int) $link['id'],
+            'display_name' => $link['display_name'],
+        ];
+    }
+
+    $classes = $db->query('SELECT id, name, created_at FROM classes ORDER BY name');
+    $result = [];
+
+    foreach ($classes->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $row = normalizeRow($row);
+        $teachers = $teachersByClass[$row['id']] ?? [];
+        $first = null;
+
+        foreach ($teachers as $teacher) {
+            if ($first === null || $teacher['id'] < $first['id']) {
+                $first = $teacher;
+            }
+        }
+
+        $result[] = [
+            'id' => $row['id'],
+            'name' => $row['name'],
+            'teacher_id' => $first['id'] ?? null,
+            'teacher_name' => $first['display_name'] ?? null,
+            'created_at' => $row['created_at'],
+            'teachers' => $teachers,
+        ];
+    }
+
+    return $result;
 }
 
 // Az SQLite szövegként adja az azonosítókat és a számokat, ezeket egész számmá alakítjuk.

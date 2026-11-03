@@ -46,7 +46,9 @@ final class TeacherTest extends TestCase
             "INSERT INTO users (username, password_hash, display_name, role) VALUES ('masik', 'x', 'Másik', 'teacher')"
         );
         $otherId = (int) $this->db->lastInsertId();
-        $this->db->exec("INSERT INTO classes (name, teacher_id) VALUES ('11.C', $otherId)");
+        $this->db->exec("INSERT INTO classes (name) VALUES ('11.C')");
+        $newClassId = $this->classId('11.C');
+        $this->db->exec("INSERT INTO teacher_classes (teacher_id, class_id) VALUES ($otherId, $newClassId)");
 
         $classes = listTeacherClasses($this->db, $this->teacherId());
 
@@ -104,14 +106,35 @@ final class TeacherTest extends TestCase
         $this->assertCount(4, $students);
     }
 
-    public function testFindClassOwner(): void
+    public function testTeacherHasClass(): void
     {
-        $classId = $this->classId('9.A');
+        $this->assertTrue(teacherHasClass($this->db, $this->teacherId(), $this->classId('9.A')));
+    }
 
-        $this->assertSame(
-            ['id' => $classId, 'teacher_id' => $this->teacherId()],
-            findClassOwner($this->db, $classId)
+    public function testTeacherHasNoAccessToUnassignedClass(): void
+    {
+        $this->db->exec("INSERT INTO classes (name) VALUES ('11.C')");
+
+        $this->assertFalse(teacherHasClass($this->db, $this->teacherId(), $this->classId('11.C')));
+    }
+
+    public function testTeacherHasClassIsNullForMissingClass(): void
+    {
+        $this->assertNull(teacherHasClass($this->db, $this->teacherId(), 999));
+    }
+
+    public function testSameClassIsListedForEveryAssignedTeacher(): void
+    {
+        $this->db->exec(
+            "INSERT INTO users (username, password_hash, display_name, role) VALUES ('masik', 'x', 'Másik', 'teacher')"
         );
-        $this->assertNull(findClassOwner($this->db, 999));
+        $otherId = (int) $this->db->lastInsertId();
+        $classId = $this->classId('9.A');
+        $this->db->exec("INSERT INTO teacher_classes (teacher_id, class_id) VALUES ($otherId, $classId)");
+
+        $this->assertSame(['9.A'], array_column(listTeacherClasses($this->db, $otherId), 'name'));
+        $this->assertContains('9.A', array_column(listTeacherClasses($this->db, $this->teacherId()), 'name'));
+        $this->assertTrue(teacherHasClass($this->db, $otherId, $classId));
+        $this->assertTrue(teacherHasClass($this->db, $this->teacherId(), $classId));
     }
 }

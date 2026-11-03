@@ -25,7 +25,8 @@ Csak bejelentkezett admin használhatja. Közös hibák: `401` (nincs bejelentke
 - `GET admin/teachers.php`
   - `200` – `{ "teachers": [{ "id", "username", "display_name", "role", "created_at" }] }` (az összes tanár, névsorban)
 - `GET admin/classes.php`
-  - `200` – `{ "classes": [{ "id", "name", "teacher_id", "teacher_name", "created_at" }] }` (az összes osztály, névsorban; a `teacher_id` és a `teacher_name` `null`, ha nincs tanára)
+  - `200` – `{ "classes": [{ "id", "name", "teacher_id", "teacher_name", "created_at", "teachers": [{ "id", "display_name" }] }] }` (az összes osztály, névsorban; a `teachers` az osztály összes tanára névsorban, üres lista, ha nincs tanára)
+  - Egy osztályhoz több tanár is tartozhat. A `teacher_id` és a `teacher_name` átmenetileg megmarad a régi felület miatt: a legkorábban felvett hozzárendelt tanár adatai, `null`, ha nincs tanára. Új kódban a `teachers` listát kell használni.
 
 Felvétel (`POST`):
 
@@ -33,7 +34,7 @@ Felvétel (`POST`):
   - `201` – `{ "teacher": { "id", "username", "display_name", "role", "created_at" } }`
   - `400` – hiányzó adat
   - `409` – a felhasználónév már foglalt
-- `POST admin/classes.php` (kérés: `name`, `teacher_id` – nem kötelező)
+- `POST admin/classes.php` (kérés: `name`, `teacher_id` – nem kötelező; megadva az osztály a tanárhoz lesz rendelve)
   - `201` – `{ "class": { "id", "name", "teacher_id", "created_at" } }`
   - `400` – hiányzó név, vagy a `teacher_id` nem egész szám
   - `404` – a megadott tanár nem létezik
