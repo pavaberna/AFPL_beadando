@@ -23,10 +23,14 @@ Mindhárom `405`-öt ad, ha rossz a HTTP metódus.
 Csak bejelentkezett admin használhatja. Közös hibák: `401` (nincs bejelentkezve), `403` (nem admin), `405` (rossz metódus).
 
 - `GET admin/teachers.php`
-  - `200` – `{ "teachers": [{ "id", "username", "display_name", "role", "created_at" }] }` (az összes tanár, névsorban)
+  - `200` – `{ "teachers": [{ "id", "username", "display_name", "role", "created_at", "class_ids": [1, 3] }] }` (az összes tanár, névsorban; a `class_ids` a tanárhoz rendelt osztályok azonosítói, üres lista, ha nincs osztálya)
 - `GET admin/classes.php`
   - `200` – `{ "classes": [{ "id", "name", "teacher_id", "teacher_name", "created_at", "teachers": [{ "id", "display_name" }] }] }` (az összes osztály, névsorban; a `teachers` az osztály összes tanára névsorban, üres lista, ha nincs tanára)
   - Egy osztályhoz több tanár is tartozhat. A `teacher_id` és a `teacher_name` átmenetileg megmarad a régi felület miatt: a legkorábban felvett hozzárendelt tanár adatai, `null`, ha nincs tanára. Új kódban a `teachers` listát kell használni.
+- `GET admin/students.php?class_id=1`
+  - `200` – `{ "students": [{ "id", "class_id", "name", "weight", "created_at" }] }` (az osztály diákjai, névsorban)
+  - `400` – a `class_id` hiányzik vagy nem egész szám
+  - `404` – a megadott osztály nem létezik
 
 Felvétel (`POST`):
 
@@ -58,6 +62,31 @@ Tóth Béla
 ```
 
 Hibás fájlnál egyetlen diák sem kerül be. Az osztályban már szereplő vagy a fájlban ismétlődő nevek a `skipped` listába kerülnek, ezért ugyanaz a fájl többször is feltölthető. Egy új diákot, akinek a neve megegyezik egy osztálytársáéval, az `admin/students.php` végponton kell felvenni.
+
+Módosítás (`PATCH`, a kérés törzse JSON, az `id` kötelező, a többi mező közül legalább egyet meg kell adni):
+
+- `PATCH admin/teachers.php` (kérés: `id`, `display_name`, `username`, `password`, `class_ids` – mind nem kötelező)
+  - `200` – `{ "teacher": { "id", "username", "display_name", "role", "created_at", "class_ids" } }`
+  - `400` – hibás `id`, üres név, felhasználónév vagy jelszó, a `class_ids` nem egész számokból álló lista, vagy nincs módosítandó mező
+  - `404` – a megadott tanár vagy a `class_ids` egyik osztálya nem létezik
+  - `409` – a felhasználónév már foglalt
+  - A `class_ids` a tanárhoz rendelt osztályok **teljes új listája**: ami nincs benne, annak a hozzárendelése megszűnik (az osztály megmarad), az üres lista mindet leveszi. Más tanárok hozzárendelését nem érinti.
+- `PATCH admin/classes.php` (kérés: `id`, `name`)
+  - `200` – `{ "class": { "id", "name", "teacher_id", "teacher_name", "created_at", "teachers" } }`
+  - `400` – hibás `id` vagy hiányzó név
+  - `404` – az osztály nem létezik
+  - `409` – az osztálynév már foglalt
+- `PATCH admin/students.php` (kérés: `id`, `name`, `weight`, `class_id` – mind nem kötelező)
+  - `200` – `{ "student": { "id", "class_id", "name", "weight", "created_at" } }`
+  - `400` – hibás `id`, üres név, a `weight` nem legalább 1 egész szám, a `class_id` nem egész szám, vagy nincs módosítandó mező
+  - `404` – a diák vagy a megadott osztály nem létezik
+
+Törlés (`DELETE`, a kérés törzse JSON: `{ "id": 1 }`):
+
+- `DELETE admin/teachers.php` – a tanár törlődik, a hozzárendelései megszűnnek, az osztályai megmaradnak
+- `DELETE admin/classes.php` – az osztály, a diákjai és azok kihúzási előzményei törlődnek, a tanárok megmaradnak
+- `DELETE admin/students.php` – a diák és a kihúzási előzményei törlődnek
+  - Mindháromnál `200` – `{ "ok": true }`, `400` – hibás `id`, `404` – nem létezik
 
 ### Teacher API
 
