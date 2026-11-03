@@ -138,10 +138,13 @@ function listClasses(PDO $db): array
     foreach ($classes->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $row = normalizeRow($row);
         $teachers = $teachersByClass[$row['id']] ?? [];
-        $first = $teachers === [] ? null : array_reduce(
-            $teachers,
-            fn (?array $carry, array $teacher): array => $carry === null || $teacher['id'] < $carry['id'] ? $teacher : $carry
-        );
+        $first = null;
+
+        foreach ($teachers as $teacher) {
+            if ($first === null || $teacher['id'] < $first['id']) {
+                $first = $teacher;
+            }
+        }
 
         $result[] = [
             'id' => $row['id'],
