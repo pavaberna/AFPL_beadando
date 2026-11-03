@@ -28,7 +28,7 @@ final class SchemaTest extends TestCase
             ->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
             ->fetchAll(PDO::FETCH_COLUMN);
 
-        $this->assertSame(['classes', 'draw_history', 'students', 'users'], $tables);
+        $this->assertSame(['classes', 'draw_history', 'students', 'teacher_classes', 'users'], $tables);
     }
 
     public function testSchemaCanBeAppliedTwice(): void

@@ -23,13 +23,13 @@ if (isset($_GET['class_id'])) {
         jsonResponse(400, ['error' => 'Az osztály azonosítója egész szám kell legyen']);
     }
 
-    $owner = findClassOwner($db, $classId);
+    $assigned = teacherHasClass($db, $teacherId, $classId);
 
-    if ($owner === null) {
+    if ($assigned === null) {
         jsonResponse(404, ['error' => 'A megadott osztály nem található']);
     }
 
-    if ($owner['teacher_id'] !== $teacherId) {
+    if (!$assigned) {
         jsonResponse(403, ['error' => 'Ez az osztály nem hozzád tartozik']);
     }
 
