@@ -1,9 +1,11 @@
+import { minimumJelenlevo } from "./porgetes.js";
+
 const svgNevter = "http://www.w3.org/2000/svg";
 const sugar = 153;
 const feliratX = 324;
 
 export function kerekSzeletek(jelenlevok) {
-    if (jelenlevok.length < 3) return [];
+    if (jelenlevok.length < minimumJelenlevo) return [];
 
     const meret = 360 / jelenlevok.length;
     return jelenlevok.map((diak, index) => {
@@ -88,7 +90,7 @@ function probaNyertesek(jeloltek, darab) {
     return nyertesek;
 }
 
-export function szerencsekerekLetrehozasa(panel) {
+export function szerencsekerekLetrehozasa(panel, nyertesMegjelenitese, sorsolasMegkezdese) {
     // Osztályváltáskor a régi tárcsa leválik, így a futó animáció is leáll.
     const regiTarcsa = panel.querySelector(".kerek-szeletek");
     const tarcsa = regiTarcsa.cloneNode(false);
@@ -111,6 +113,7 @@ export function szerencsekerekLetrehozasa(panel) {
                 if (!beallitasok) return;
                 automatikus = beallitasok.automatikus;
                 nyertesek = probaNyertesek(szeletek, beallitasok.darab);
+                sorsolasMegkezdese();
             }
             gomb.disabled = true;
             do {
@@ -120,6 +123,7 @@ export function szerencsekerekLetrehozasa(panel) {
                 if (!tarcsa.isConnected) return;
                 szog = cel % 360;
                 console.log(nyertes.diak.name);
+                nyertesMegjelenitese(nyertes.diak);
                 if (automatikus && nyertesek.length) {
                     await new Promise(folytatas => setTimeout(folytatas, 450));
                     if (!tarcsa.isConnected) return;

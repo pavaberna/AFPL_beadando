@@ -47,9 +47,7 @@ h2 {
 #szerencsekerek {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 10px;
-    
+    padding: 10px;   
 }
 #tanar-tartalom {
     border-right: var(--border-thin);

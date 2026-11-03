@@ -4,6 +4,7 @@ import {
 } from "./tanar/adatok.js";
 
 import { szerencsekerekLetrehozasa } from "./tanar/szerencsekerek.js";
+import { minimumJelenlevo } from "./tanar/porgetes.js";
 import { nevsorTartalma } from "./tanar/nevsor.js";
 
 const tartalom = document.getElementById("tanar-tartalom");
@@ -59,7 +60,19 @@ function kerekAllapotFrissitese(uzenet) {
 
 async function nevsorMegnyitasa(osztaly) {
     const hely = betoltesInditasa(`${osztaly.name} névsorának betöltése…`);
-    const kerek = szerencsekerekLetrehozasa(kerekPanel);
+    const eredmenyek = document.createElement("ol");
+    eredmenyek.setAttribute("aria-live", "polite");
+    function eredmenylistaMegnyitasa() {
+        const cim = document.createElement("h2");
+        cim.textContent = `${osztaly.name} – Mai sorsolás`;
+        hely.replaceChildren(cim, eredmenyek);
+    }
+
+    const kerek = szerencsekerekLetrehozasa(kerekPanel, diak => {
+        const sor = document.createElement("li");
+        sor.textContent = diak.name;
+        eredmenyek.append(sor);
+    }, eredmenylistaMegnyitasa);
     kerekAllapotFrissitese("A névsor betöltése folyamatban…");
 
     try {
@@ -69,8 +82,8 @@ async function nevsorMegnyitasa(osztaly) {
         if (!hely.isConnected) return;
 
         const nevsor = nevsorTartalma(osztaly, diakok, (jelenlevok, inditas) => {
-            const uzenet = jelenlevok.length < 3
-                ? "A pörgetéshez legalább 3 jelenlévő tanuló szükséges."
+            const uzenet = jelenlevok.length < minimumJelenlevo
+                ? `A pörgetéshez legalább ${minimumJelenlevo} jelenlévő tanuló szükséges.`
                 : "";
 
             kerekAllapotFrissitese(uzenet);

@@ -1,3 +1,5 @@
+export const minimumJelenlevo = 4;
+
 export function porgetesBeallitasLetrehozasa() {
     const elem = document.createElement("div");
 
@@ -19,7 +21,8 @@ export function porgetesBeallitasLetrehozasa() {
     const uzenet = elem.querySelector("p");
 
     function letszamBeallitasa(jelenlevokSzama) {
-        const kevesenVannak = jelenlevokSzama < 3;
+        const maximum = jelenlevokSzama - 1;
+        const kevesenVannak = jelenlevokSzama < minimumJelenlevo;
         const elozoErtek = Number(valaszto.value) || 3;
 
         cimke.hidden = kevesenVannak;
@@ -31,23 +34,24 @@ export function porgetesBeallitasLetrehozasa() {
 
         if (kevesenVannak) return;
 
-        for (let darab = 3; darab <= jelenlevokSzama; darab++) {
+        for (let darab = 3; darab <= maximum; darab++) {
             valaszto.add(new Option(darab, darab));
         }
 
-        valaszto.value = Math.min(elozoErtek, jelenlevokSzama);
+        valaszto.value = Math.min(elozoErtek, maximum);
     }
 
-    function beallitasokRogzitese(elerheto) {
-        if (Number(valaszto.value) > elerheto) {
-            valaszto.setCustomValidity(`Ma még ${elerheto} jelenlévő tanuló sorsolható.`);
+    function beallitasokRogzitese(jelenlevokSzama) {
+        const darab = Number(valaszto.value);
+        if (!Number.isInteger(darab) || darab < 3 || darab >= jelenlevokSzama) {
+            valaszto.setCustomValidity("Legalább 3 nevet válassz, és legalább egy jelenlévő maradjon ki.");
             valaszto.reportValidity();
             valaszto.setCustomValidity("");
             return null;
         }
         valaszto.disabled = true;
         automatikus.disabled = true;
-        return { darab: Number(valaszto.value), automatikus: automatikus.checked };
+        return { darab, automatikus: automatikus.checked };
     }
 
     return { elem, letszamBeallitasa, beallitasokRogzitese };

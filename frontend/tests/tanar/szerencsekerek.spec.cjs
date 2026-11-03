@@ -1,17 +1,17 @@
 const { test, expect } = require("@playwright/test");
 const { kerekSzeletek } = require("../../js/tanar/szerencsekerek.js");
 
-const diakok = ["Kiss Anna Edit", "Nagy Péter", "Nagy Pál", "Tóth Éva"].map((name, index) => ({
+const diakok = ["Kiss Anna Edit", "Nagy Péter", "Nagy Pál", "Kerekes Imre", "Tóth Éva"].map((name, index) => ({
     id: index + 1, name, weight: 1, last_drawn_on: null
 }));
 
-test("Három jelenlévőtől ID szerint külön szelet és rövidített név készül", () => {
-    expect(kerekSzeletek(diakok.slice(0, 2))).toEqual([]);
-    const szeletek = kerekSzeletek(diakok.slice(0, 3));
-    expect(szeletek.map(szelet => szelet.felirat)).toEqual(["Kiss A. E.", "Nagy P.", "Nagy P."]);
-    expect(szeletek.map(szelet => szelet.diak.id)).toEqual([1, 2, 3]);
+test("Négy jelenlévőtől ID szerint külön szelet és rövidített név készül", () => {
+    expect(kerekSzeletek(diakok.slice(0, 3))).toEqual([]);
+    const szeletek = kerekSzeletek(diakok.slice(0, 4));
+    expect(szeletek.map(szelet => szelet.felirat)).toEqual(["Kiss A. E.", "Nagy P.", "Nagy P.", "Kerekes I."]);
+    expect(szeletek.map(szelet => szelet.diak.id)).toEqual([1, 2, 3, 4]);
     expect(szeletek.map(({ kezdet, kozep, veg }) => [kezdet, kozep, veg]))
-        .toEqual([[0, 60, 120], [120, 180, 240], [240, 300, 360]]);
+        .toEqual([[0, 45, 90], [90, 135, 180], [180, 225, 270], [270, 315, 360]]);
 });
 
 for (const automatikus of [false, true]) {
@@ -38,19 +38,26 @@ for (const automatikus of [false, true]) {
             await anna.check();
             await expect(gomb).toBeHidden();
             await anna.uncheck();
-            await expect(page.locator(".kerek-szeletek text")).toHaveText(["Kiss A. E.", "Nagy P.", "Nagy P."]);
+            await expect(page.locator(".kerek-szeletek text")).toHaveText(["Kiss A. E.", "Nagy P.", "Nagy P.", "Kerekes I."]);
             await page.getByLabel("Összes név pörgetése egy kattintásra").setChecked(automatikus);
+            const eredmenyek = page.locator("#tanar-tartalom ol li");
+            await expect(eredmenyek).toHaveCount(0);
             await gomb.click();
-            await expect(anna).toBeDisabled();
+            await expect(page.getByRole("heading", { name: "9.A – Mai sorsolás" })).toBeVisible();
+            await expect(page.locator("#nevsor")).toHaveCount(0);
             if (automatikus) {
                 await expect(gomb).toBeDisabled();
+                await expect(eredmenyek).toHaveCount(0);
             } else {
-                await expect.poll(() => nevek.length).toBe(1);
+                await expect(eredmenyek).toHaveCount(1);
                 await gomb.click();
-                await expect.poll(() => nevek.length).toBe(2);
+                await expect(eredmenyek).toHaveCount(2);
                 await gomb.click();
             }
             await expect(gomb).toBeDisabled();
-            await expect.poll(() => nevek.slice().sort(), { timeout: 15000 }).toEqual(diakok.slice(0, 3).map(d => d.name).sort());
+            await expect.poll(() => nevek.length, { timeout: 15000 }).toBe(3);
+            expect(new Set(nevek).size).toBe(3);
+            expect(diakok.slice(0, 4).map(d => d.name)).toEqual(expect.arrayContaining(nevek));
+            await expect(eredmenyek).toHaveText(nevek);
         });
 }
