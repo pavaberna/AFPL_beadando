@@ -42,6 +42,21 @@ Felvétel (`POST`):
   - `201` – `{ "student": { "id", "class_id", "name", "weight", "created_at" } }`
   - `400` – hiányzó név, vagy a `class_id` nem egész szám
   - `404` – a megadott osztály nem létezik
+- `POST admin/students-import.php` (`multipart/form-data` kérés: `class_id`, `file`)
+  - `201` – `{ "imported": [{ "id", "class_id", "name", "weight", "created_at" }], "skipped": ["..."] }`
+  - `200` – ugyanez a válasz, ha minden név kimaradt, így nem jött létre új diák
+  - `400` – hiányzó fájl, hibás `class_id` vagy hibás CSV (a hibaüzenet megnevezi a hibás sort)
+  - `404` – a megadott osztály nem létezik
+
+A CSV fájl UTF-8 kódolású, az elválasztó `;` vagy `,`. Az első sor a fejléc, ebben kell lennie egy `nev`, `név` vagy `name` oszlopnak, a többi oszlop kimarad:
+
+```csv
+nev
+Kiss Anna
+Tóth Béla
+```
+
+Hibás fájlnál egyetlen diák sem kerül be. Az osztályban már szereplő vagy a fájlban ismétlődő nevek a `skipped` listába kerülnek, ezért ugyanaz a fájl többször is feltölthető. Egy új diákot, akinek a neve megegyezik egy osztálytársáéval, az `admin/students.php` végponton kell felvenni.
 
 ### Teacher API
 
