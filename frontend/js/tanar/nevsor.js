@@ -1,6 +1,6 @@
 import { porgetesBeallitasLetrehozasa } from "./porgetes.js";
 
-export function nevsorTartalma(osztaly, diakok, letszamValtozott) {
+export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
     const szakasz = document.createElement("section");
 
     const cim = document.createElement("h2");
@@ -13,7 +13,7 @@ export function nevsorTartalma(osztaly, diakok, letszamValtozott) {
 
     if (diakok.length === 0) {
         porgetes.letszamBeallitasa(0);
-        letszamValtozott(0);
+        jelenletValtozott([]);
         return szakasz;
     }
 
@@ -56,14 +56,25 @@ export function nevsorTartalma(osztaly, diakok, letszamValtozott) {
     }
 
     function letszamFrissitese() {
-        const hianyzokSzama = torzs.querySelectorAll("input:checked").length;
-        const jelenlevokSzama = diakok.length - hianyzokSzama;
+        const hianyzok = new Set(Array.from(torzs.querySelectorAll("input:checked"), jelolo => jelolo.value));
+        const jelenlevok = diakok.filter(diak => !hianyzok.has(String(diak.id)));
+        const jelenlevokSzama = jelenlevok.length;
         
         porgetes.letszamBeallitasa(jelenlevokSzama);
-        letszamValtozott(jelenlevokSzama);
+        jelenletValtozott(jelenlevok, porgetesInditasa);
         
         letszam.textContent =
-            `Jelen van ${jelenlevokSzama} fő · Hiányzik ${hianyzokSzama} fő`;
+            `Jelen van ${jelenlevokSzama} fő · Hiányzik ${hianyzok.size} fő`;
+    }
+
+    function porgetesInditasa(elerheto) {
+        const beallitasok = porgetes.beallitasokRogzitese(elerheto);
+        if (!beallitasok) return null;
+
+        for (const jelolo of torzs.querySelectorAll("input")) {
+            jelolo.disabled = true;
+        }
+        return beallitasok;
     }
 
     torzs.addEventListener("change", letszamFrissitese);

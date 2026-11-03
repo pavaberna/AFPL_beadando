@@ -7,6 +7,7 @@
     <link rel="icon" href="./img/favicon.ico">
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/tanar.css">
+    <link rel="stylesheet" href="./css/szerencsekerek.css">
     
     <script src="./js/api.js" defer></script>
     <script src="./js/auth.js" defer></script>
@@ -50,7 +51,13 @@
             <div id="szerencsekerek">
                 <p id="kerek-uzenet" role="status">A pörgetéshez válassz osztályt.</p>
                 <div id="kerek-tartalom" hidden>
-                    szerencsekerék
+                    <svg viewBox="20 66 360 326" role="img" aria-label="A jelenlévő tanulók szerencsekereke">
+                        <g class="kerek-szeletek"></g>
+                        <circle class="kerek-perem" cx="200" cy="229" r="153"/>
+                        <circle class="kerek-kozep" cx="200" cy="229" r="23"/>
+                        <path class="kerek-nyil" d="M332 229 372 207V251Z"/>
+                    </svg>
+                    <button type="button" id="kerek-porgetes">Pörgetés</button>
                 </div>
             </div>
         </div>

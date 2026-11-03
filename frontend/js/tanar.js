@@ -3,9 +3,11 @@ import {
     osztalyNevsorLekerese
 } from "./tanar/adatok.js";
 
+import { szerencsekerekLetrehozasa } from "./tanar/szerencsekerek.js";
 import { nevsorTartalma } from "./tanar/nevsor.js";
 
 const tartalom = document.getElementById("tanar-tartalom");
+const kerekPanel = document.getElementById("kerek-tartalom");
 const osztalyMenu = document.getElementById("osztaly-menu");
 const osztalyLista = document.getElementById("osztaly-lista");
 
@@ -57,6 +59,7 @@ function kerekAllapotFrissitese(uzenet) {
 
 async function nevsorMegnyitasa(osztaly) {
     const hely = betoltesInditasa(`${osztaly.name} névsorának betöltése…`);
+    const kerek = szerencsekerekLetrehozasa(kerekPanel);
     kerekAllapotFrissitese("A névsor betöltése folyamatban…");
 
     try {
@@ -65,12 +68,13 @@ async function nevsorMegnyitasa(osztaly) {
         // Ha közben másik osztályt választottak, már annak a névsora számít.
         if (!hely.isConnected) return;
 
-        const nevsor = nevsorTartalma(osztaly, diakok, (jelenlevokSzama) => {
-            const uzenet = jelenlevokSzama < 3
+        const nevsor = nevsorTartalma(osztaly, diakok, (jelenlevok, inditas) => {
+            const uzenet = jelenlevok.length < 3
                 ? "A pörgetéshez legalább 3 jelenlévő tanuló szükséges."
                 : "";
 
             kerekAllapotFrissitese(uzenet);
+            if (!uzenet) kerek(jelenlevok, inditas);
         });
 
         hely.replaceChildren(nevsor);
