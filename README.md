@@ -72,3 +72,22 @@ Hibás fájlnál egyetlen diák sem kerül be. Az osztályban már szereplő vag
   - `404` – a megadott osztály nem létezik
 
 Közös hibák: `401` (nincs bejelentkezve), `403` (be van lépve, de nem tanár), `405` (rossz metódus).
+
+## Adatbázis biztonsági mentés
+
+A `backend` mappából futtatva időbélyeggel ellátott másolat készül az adatbázisról:
+
+```sh
+php database/backup.php [adatbázis fájl útvonala] [mentési mappa]
+```
+
+Paraméterek nélkül a `database/database.sqlite` fájlt menti a `database/backups` mappába, például `database_2026-11-03_02-00-00.sqlite` néven. Sikeres mentésnél a kimenet `Backup finished: <útvonal>`, hibánál `Backup failed: <hiba>`, és a kilépési kód `1`. Hiányzó adatbázisnál nem jön létre üres mentés.
+
+A szkript futásonként egy mentést készít, a napi futtatást ütemezővel kell beállítani (az útvonalat a saját telepítésre kell cserélni):
+
+- Linux (`crontab -e`, minden nap 2:00-kor): `0 2 * * * cd /eleresi/ut/backend && php database/backup.php`
+- Windows: `schtasks /Create /SC DAILY /ST 02:00 /TN "AFPL backup" /TR "php C:\eleresi\ut\backend\database\backup.php"`
+
+A régi mentések nem törlődnek automatikusan. A mentések jelszóhasheket is tartalmaznak, ezért nem kerülhetnek nyilvánosan elérhető helyre. A `.gitignore` miatt a repóba sem kerülnek be.
+
+Visszaállítás: amíg az alkalmazás nem kap kéréseket, a kiválasztott mentést kell a `database/database.sqlite` helyére másolni.
