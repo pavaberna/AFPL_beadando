@@ -12,43 +12,71 @@ body[data-oldal="tanar"] #top-nav summary {
 }
 #top-nav .lenyilo-menu {
     position: absolute;
-    top: 35px;
-    left: -15px;
+    top: 40px;
+    right: 0;
     z-index: 10;
     background-color: var(--color-text);
+    border-radius: 0 0 5px 5px;
+    padding-top: 20px
 }
 #top-nav .lenyilo-menu button{
-    border-radius: 0;
     padding: 10px 20px;
     width: max-content;
     font-weight: normal;
     font-size: 80%;
 }
-
-.osztaly-gombok.flex-x {
-    justify-content: flex-start;
+#osztaly-menu {
+    padding-left: 10px;
 }
-button.card {
-    margin: 0;
+#osztaly-menu > .lenyilo-menu {
+    top: 100%;
 }
 
-
-.nevsor-fejlec {
+h2 {
+    padding-top:0;
+}
+#vedett-tartalom:not([hidden]) {
+    display: grid;
+}
+#vedett-tartalom > .grid-2 {
+    grid-template-columns: 1fr 2fr;
+    align-self: stretch;
+    align-items: stretch;
+}
+#tanar-tartalom,
+#szerencsekerek {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+    
 }
-
-.nevsor-fejlec h2,
-.nevsor-fejlec > div > p {
-    margin: 0;
+#tanar-tartalom {
+    border-right: var(--border-thin);
 }
-
+select#porgetes-darab {
+    padding: 2px 10px;
+    text-align: center;
+}
 button.modositas:disabled {
     opacity: 0.5;
     cursor: inherit;
     background-color: inherit;
     color:inherit;
+}
+
+table#nevsor {
+    margin-top: 20px;
+    border-radius: 0;
+    font-size: 80%;
+    th,
+    td {
+        padding: 3px 5px;
+        border-bottom:var(--border-thin);
+        border-radius: 0;
+    }
+    th:first-child,
+    td:first-child {
+        text-align: center;
+    }
 }

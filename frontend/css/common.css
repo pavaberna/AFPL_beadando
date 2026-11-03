@@ -3,10 +3,13 @@
     --color-text: #20354b;
     --color-primary: #87CEEB;
     --color-on-primary: #20354B;
-    --color-border: #607D8B;
+    --color-border: #607c8a;
     --color-success: #287568;
     --color-danger: #B84A3A;
     --color-shadow: #20354b80;
+
+    --color-light:#ccc;
+    --color-dark: rgb(64, 64, 64);
 
     --border-thin: 1px solid var(--color-border); 
     --border-bold: 3px var(--color-border) ridge;
@@ -34,14 +37,20 @@
 html {
     scroll-behavior: smooth;
 }
+
 body {
+    margin: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
     background-color: var(--color-background);
     color: var(--color-text);
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.5;
 }
 main {
-    padding: 25px 0;
+    flex-grow: 1;
+    padding: 0;
     background-color: var(--color-background);
 }
 h2 {
@@ -74,8 +83,8 @@ button.btn-img:hover img {
 }
 .container {
     width: 95%;
-    max-width: 800px;
-    margin: auto;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 .icon {
     width: var(--icon-width);
@@ -142,13 +151,18 @@ button.btn-img:hover img {
     font: inherit;
     font-variant: small-caps;
 }
-#top-nav button:hover {
+#top-nav select.menu-item option {
+    background-color: var(--color-text);
+    color: var(--color-background);
+}
+#top-nav button:hover
+{
     color: var(--color-primary);
 }
 #belepesi-allapot {
     height: 40px;
     line-height: 40px;
-    padding: 0 10px 0 5px;
+    padding: 0 0 0 5px;
 }
 #top-nav button#kijelentkezes,
 #top-nav button#padlock {
@@ -158,7 +172,7 @@ button.btn-img:hover img {
 /* dátum */
 #aktualis-datum {
     display: block;
-    text-align: right;
+    text-align: left;
     font-size: 0.85rem;
     padding-block: 0.25rem;
 }
@@ -167,7 +181,8 @@ button.btn-img:hover img {
 
 footer { 
     text-align: center;
-    padding: 50px 0 50px 0;
+    padding: 30px 0 30px 0;
+    border-top: var(--border-thin);
 }
 
 /* form */
@@ -184,7 +199,7 @@ form label {
     margin-left: 10px;
     margin-top: 10px;
 }
-input, select {
+form input, form select {
   border: var(--border-thin);
   border-radius: var(--radius);
   padding: 10px;

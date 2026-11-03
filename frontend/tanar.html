@@ -19,39 +19,42 @@
             <h1>Diáksorsoló</h1>
         </div>
     </header>
-    <div id="top-nav">
+    <header id="top-nav">
         <div class="container flex-x">
-            <nav>
-                <button class="menu-item" id="osztalyok-gomb" data-nezet="osztalyok">Osztályok</button>
-            </nav>
-            <div>
-                <time id="aktualis-datum"></time>
-                <details>
-                    <summary>  
-                        <span id="belepesi-allapot"></span>        
-                        <img class="icon" src="img/id-card.png" alt="">
-                    </summary>
-                    <div class="lenyilo-menu">
-                        <button type="button" class="menu-item" id="beallitasok-gomb">
-                            Beállítások
-                        </button>
-                        <button type="button" class="menu-item" data-muvelet="kijelentkezes">
-                            Kijelentkezés
-                        </button>
-                    </div>
-                </details>
-            </div>
-        </div>
+            <details id="osztaly-menu">
+                <summary class="menu-item">Osztályok ▾</summary>
+                <div id="osztaly-lista" class="lenyilo-menu"></div>
+            </details>
+            <details>
+                <summary>  
+                    <img class="icon" src="img/user.png" alt="">
+                    <span id="belepesi-allapot"></span>        
+                </summary>
+                <div class="lenyilo-menu">
+                    <button type="button" class="menu-item" id="beallitasok-gomb">
+                        Beállítások
+                    </button>
+                    <button type="button" class="menu-item" data-muvelet="kijelentkezes">
+                        Kijelentkezés
+                    </button>
+                </div>
+            </details>
+        </header>
     </div>
-
     <main id="vedett-tartalom" hidden>
-        <div class="container">
+        <div class="container grid grid-2">
             <div id="tanar-tartalom">
                 Tanári jogosultsággal bejelentkezve
+                <time id="aktualis-datum"></time>
+            </div>
+            <div id="szerencsekerek">
+                <p id="kerek-uzenet" role="status">A pörgetéshez válassz osztályt.</p>
+                <div id="kerek-tartalom" hidden>
+                    szerencsekerék
+                </div>
             </div>
         </div>
     </main>
-
     <footer>
         <p>Diáksorsoló – AFPL I. projekt</p>
     </footer>

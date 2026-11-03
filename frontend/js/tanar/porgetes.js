@@ -1,63 +1,35 @@
 export function porgetesBeallitasLetrehozasa() {
-    let porgetesekSzama = 3;
-
     const elem = document.createElement("div");
+
     elem.innerHTML = `
-        <p>
-            Pörgetések száma: <strong class="porgetes-ertek">3</strong>
-            <button type="button" class="modositas">Módosítás</button>
-        </p>
-        <dialog id="porgetes-dialog"aria-labelledby="porgetes-cim">
-            <h3 id="porgetes-cim">Pörgetések beállítása</h3>
-            <form>
-                <label for="porgetes-darab">Pörgetések száma</label>
-                <input id="porgetes-darab" type="number" min="3" step="1" required>
-                <button type="submit">Mentés</button>
-                <button type="button" class="megse">Mégse</button>
-            </form>
-        </dialog>
+        <label>
+            Pörgetések száma:
+            <select id="porgetes-darab"></select>
+        </label>
+        <p role="status" hidden>Nincs elég diák a pörgetéshez.</p>
     `;
 
-    const ertek = elem.querySelector(".porgetes-ertek");
-    const modositas = elem.querySelector(".modositas");
-    const ablak = elem.querySelector("dialog");
-    const mezo = elem.querySelector("input");
-
-    modositas.addEventListener("click", () => {
-        mezo.value = porgetesekSzama;
-        ablak.showModal();
-    });
-
-    elem.querySelector(".megse").addEventListener("click", () => {
-        ablak.close();
-    });
-
-    elem.querySelector("form").addEventListener("submit", (event) => {
-        event.preventDefault();
-        porgetesekSzama = mezo.valueAsNumber;
-        ertek.textContent = porgetesekSzama;
-        ablak.close();
-    });
+    const cimke = elem.querySelector("label");
+    const valaszto = elem.querySelector("select");
+    const uzenet = elem.querySelector("p");
 
     function letszamBeallitasa(jelenlevokSzama) {
         const kevesenVannak = jelenlevokSzama < 3;
-        const mostKellJelezni = kevesenVannak && !modositas.disabled;
+        const elozoErtek = Number(valaszto.value) || 3;
 
-        modositas.disabled = kevesenVannak;
-        mezo.max = jelenlevokSzama;
+        cimke.hidden = kevesenVannak;
+        valaszto.disabled = kevesenVannak;
+        uzenet.hidden = !kevesenVannak;
 
-        if (kevesenVannak) {
-            porgetesekSzama = 3;
-            ertek.textContent = "–";
+        valaszto.replaceChildren();
 
-            if (mostKellJelezni) {
-                alert("A pörgetéshez legalább 3 jelenlévő tanuló szükséges.");
-            }
-            return;
+        if (kevesenVannak) return;
+
+        for (let darab = 3; darab <= jelenlevokSzama; darab++) {
+            valaszto.add(new Option(darab, darab));
         }
 
-        porgetesekSzama = Math.min(porgetesekSzama, jelenlevokSzama);
-        ertek.textContent = porgetesekSzama;
+        valaszto.value = Math.min(elozoErtek, jelenlevokSzama);
     }
 
     return { elem, letszamBeallitasa };
