@@ -16,20 +16,28 @@ function cleanString(mixed $value): ?string
     return $value === '' ? null : $value;
 }
 
-function usernameTaken(PDO $db, string $username): bool
+// Az exceptId azonosítójú felhasználót nem számítjuk, így módosításkor a saját név nem ütközik.
+function usernameTaken(PDO $db, string $username, ?int $exceptId = null): bool
 {
-    $stmt = $db->prepare('SELECT 1 FROM users WHERE username = ?');
-    $stmt->execute([$username]);
+    $stmt = $db->prepare('SELECT 1 FROM users WHERE username = ? AND id != ?');
+    $stmt->execute([$username, $exceptId ?? 0]);
 
     return $stmt->fetchColumn() !== false;
 }
 
-function classNameTaken(PDO $db, string $name): bool
+// Az exceptId azonosítójú osztályt nem számítjuk, így módosításkor a saját név nem ütközik.
+function classNameTaken(PDO $db, string $name, ?int $exceptId = null): bool
 {
-    $stmt = $db->prepare('SELECT 1 FROM classes WHERE name = ?');
-    $stmt->execute([$name]);
+    $stmt = $db->prepare('SELECT 1 FROM classes WHERE name = ? AND id != ?');
+    $stmt->execute([$name, $exceptId ?? 0]);
 
     return $stmt->fetchColumn() !== false;
+}
+
+// Igaz, ha az érték egész számokból álló JSON tömb (az üres tömb is az), nem objektum.
+function isIntList(mixed $value): bool
+{
+    return is_array($value) && array_is_list($value) && array_filter($value, 'is_int') === $value;
 }
 
 // Igaz, ha a megadott azonosítóval létezik tanár szerepkörű felhasználó.
@@ -118,7 +126,7 @@ function parseStudentCsv(string $content): array
     $lines = explode("\n", str_replace(["\r\n", "\r"], "\n", $content));
     $separator = str_contains($lines[0], ';') ? ';' : ',';
     $columns = array_map(
-        fn (?string $cell): string => strtolower(trim((string) $cell)),
+        fn(?string $cell): string => strtolower(trim((string) $cell)),
         str_getcsv($lines[0], $separator, '"', '')
     );
     $nameColumn = array_key_first(array_intersect($columns, ['nev', 'név', 'name']));
@@ -184,20 +192,153 @@ function importStudents(PDO $db, int $classId, array $names): array
     return $result;
 }
 
-// Az összes tanár (az adminok nélkül) név szerint rendezve.
-function listTeachers(PDO $db): array
+// Az összes tanár (az adminok nélkül) név szerint rendezve, a hozzájuk rendelt osztályok
+// azonosítóival (class_ids, növekvő sorrendben). Az id megadásakor csak az az egy tanár.
+function listTeachers(PDO $db, ?int $id = null): array
 {
-    $stmt = $db->query(
-        "SELECT id, username, display_name, role, created_at FROM users WHERE role = 'teacher' ORDER BY display_name"
+    $stmt = $db->prepare(
+        "SELECT id, username, display_name, role, created_at FROM users
+        WHERE role = 'teacher' AND (? IS NULL OR id = ?) ORDER BY display_name"
     );
+    $stmt->execute([$id, $id]);
+
+    $classIds = [];
+    $links = $db->query('SELECT teacher_id, class_id FROM teacher_classes ORDER BY class_id');
+
+    foreach ($links->fetchAll(PDO::FETCH_ASSOC) as $link) {
+        $classIds[(int) $link['teacher_id']][] = (int) $link['class_id'];
+    }
+
+    return array_map(function (array $row) use ($classIds): array {
+        $teacher = normalizeRow($row);
+        $teacher['class_ids'] = $classIds[$teacher['id']] ?? [];
+
+        return $teacher;
+    }, $stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+// Tanár módosítása: a changes a username, display_name és password közül azokat tartalmazza, amelyek
+// változnak; a classIds (ha nem null) a tanárhoz rendelt osztályok teljes új listája. Az egyediséget,
+// a tanár és az osztályok létezését a hívó ellenőrzi.
+function updateTeacher(PDO $db, int $id, array $changes, ?array $classIds): void
+{
+    $columns = [];
+    $values = [];
+
+    foreach (['username', 'display_name'] as $column) {
+        if (isset($changes[$column])) {
+            $columns[] = "$column = ?";
+            $values[] = $changes[$column];
+        }
+    }
+
+    if (isset($changes['password'])) {
+        $columns[] = 'password_hash = ?';
+        $values[] = password_hash($changes['password'], PASSWORD_DEFAULT);
+    }
+
+    $db->beginTransaction();
+
+    try {
+        if ($columns !== []) {
+            $stmt = $db->prepare('UPDATE users SET ' . implode(', ', $columns) . ' WHERE id = ?');
+            $stmt->execute([...$values, $id]);
+        }
+
+        if ($classIds !== null) {
+            $stmt = $db->prepare('DELETE FROM teacher_classes WHERE teacher_id = ?');
+            $stmt->execute([$id]);
+
+            $stmt = $db->prepare('INSERT INTO teacher_classes (teacher_id, class_id) VALUES (?, ?)');
+
+            foreach (array_unique($classIds) as $classId) {
+                $stmt->execute([$id, $classId]);
+            }
+        }
+
+        $db->commit();
+    } catch (Throwable $e) {
+        $db->rollBack();
+        throw $e;
+    }
+}
+
+// Tanár törlése: a hozzárendelései megszűnnek, az osztályai megmaradnak.
+function deleteTeacher(PDO $db, int $id): void
+{
+    $stmt = $db->prepare("DELETE FROM users WHERE id = ? AND role = 'teacher'");
+    $stmt->execute([$id]);
+}
+
+// Osztály átnevezése. A név egyediségét és az osztály létezését a hívó ellenőrzi.
+function renameClass(PDO $db, int $id, string $name): void
+{
+    $stmt = $db->prepare('UPDATE classes SET name = ? WHERE id = ?');
+    $stmt->execute([$name, $id]);
+}
+
+// Osztály törlése: a diákjai, azok kihúzási előzményei és a tanári hozzárendelései is törlődnek.
+function deleteClass(PDO $db, int $id): void
+{
+    $stmt = $db->prepare('DELETE FROM classes WHERE id = ?');
+    $stmt->execute([$id]);
+}
+
+function studentExists(PDO $db, int $id): bool
+{
+    $stmt = $db->prepare('SELECT 1 FROM students WHERE id = ?');
+    $stmt->execute([$id]);
+
+    return $stmt->fetchColumn() !== false;
+}
+
+// Az osztály diákjai név szerint rendezve.
+function listStudents(PDO $db, int $classId): array
+{
+    $stmt = $db->prepare(
+        'SELECT id, class_id, name, weight, created_at FROM students WHERE class_id = ? ORDER BY name'
+    );
+    $stmt->execute([$classId]);
 
     return array_map('normalizeRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+// Diák módosítása: a changes a name, weight és class_id közül azokat tartalmazza, amelyek változnak.
+// A diák és az osztály létezését, valamint az értékek érvényességét a hívó ellenőrzi.
+function updateStudent(PDO $db, int $id, array $changes): array
+{
+    $columns = [];
+    $values = [];
+
+    foreach (['name', 'weight', 'class_id'] as $column) {
+        if (isset($changes[$column])) {
+            $columns[] = "$column = ?";
+            $values[] = $changes[$column];
+        }
+    }
+
+    if ($columns !== []) {
+        $stmt = $db->prepare('UPDATE students SET ' . implode(', ', $columns) . ' WHERE id = ?');
+        $stmt->execute([...$values, $id]);
+    }
+
+    $stmt = $db->prepare('SELECT id, class_id, name, weight, created_at FROM students WHERE id = ?');
+    $stmt->execute([$id]);
+
+    return normalizeRow($stmt->fetch(PDO::FETCH_ASSOC));
+}
+
+// Diák törlése: a kihúzási előzményei is törlődnek.
+function deleteStudent(PDO $db, int $id): void
+{
+    $stmt = $db->prepare('DELETE FROM students WHERE id = ?');
+    $stmt->execute([$id]);
 }
 
 // Az összes osztály név szerint rendezve. A teachers az osztály összes tanára név szerint. A
 // teacher_id és a teacher_name átmenetileg megmarad a régi felület miatt: a legkorábban felvett
 // hozzárendelt tanár adatai, vagy null, ha az osztálynak nincs tanára.
-function listClasses(PDO $db): array
+function listClasses(PDO $db, ?int $id = null): array
 {
     $teachersByClass = [];
     $links = $db->query(
@@ -214,7 +355,8 @@ function listClasses(PDO $db): array
         ];
     }
 
-    $classes = $db->query('SELECT id, name, created_at FROM classes ORDER BY name');
+    $classes = $db->prepare('SELECT id, name, created_at FROM classes WHERE (? IS NULL OR id = ?) ORDER BY name');
+    $classes->execute([$id, $id]);
     $result = [];
 
     foreach ($classes->fetchAll(PDO::FETCH_ASSOC) as $row) {

@@ -40,8 +40,36 @@ final class AdminListTest extends TestCase
     {
         $teacher = listTeachers($this->db)[0];
 
-        $this->assertSame(['id', 'username', 'display_name', 'role', 'created_at'], array_keys($teacher));
+        $this->assertSame(
+            ['id', 'username', 'display_name', 'role', 'created_at', 'class_ids'],
+            array_keys($teacher)
+        );
         $this->assertIsInt($teacher['id']);
+    }
+
+    public function testListTeachersReturnsClassIdsOfTheTeacher(): void
+    {
+        $teacher = listTeachers($this->db)[0];
+        $classIds = array_column(listClasses($this->db), 'id');
+        sort($classIds);
+
+        $this->assertSame($classIds, $teacher['class_ids']);
+    }
+
+    public function testListTeachersHasEmptyClassIdsWithoutClasses(): void
+    {
+        $new = createTeacher($this->db, 'uj-tanar', 'titok123', 'Bakos Tamás');
+
+        $this->assertSame([], listTeachers($this->db, $new['id'])[0]['class_ids']);
+    }
+
+    public function testListTeachersCanBeLimitedToOneTeacher(): void
+    {
+        createTeacher($this->db, 'uj-tanar', 'titok123', 'Bakos Tamás');
+        $id = listTeachers($this->db)[1]['id'];
+
+        $this->assertSame([$id], array_column(listTeachers($this->db, $id), 'id'));
+        $this->assertSame([], listTeachers($this->db, 999));
     }
 
     public function testListTeachersIncludesNewlyCreatedTeacher(): void
