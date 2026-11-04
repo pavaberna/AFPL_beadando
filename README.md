@@ -90,7 +90,7 @@ Törlés (`DELETE`, a kérés törzse JSON: `{ "id": 1 }`):
 
 ### Teacher API
 
-`GET teacher/classes.php` – csak bejelentkezett tanár használhatja.
+Csak bejelentkezett tanár használhatja.
 
 - `GET teacher/classes.php`
   - `200` – `{ "classes": [{ "id", "name", "created_at" }] }` (a tanárhoz rendelt osztályok, névsorban)
@@ -99,6 +99,10 @@ Törlés (`DELETE`, a kérés törzse JSON: `{ "id": 1 }`):
   - `400` – a `class_id` nem egész szám
   - `403` – az osztály másik tanárhoz tartozik
   - `404` – a megadott osztály nem létezik
+- `POST teacher/settings.php` (kérés: `display_name`) – a bejelentkezett tanár saját nevét módosítja
+  - `200` – `{ "user": { "id", "username", "display_name", "role" } }`
+  - `400` – hiányzó vagy üres név, illetve a név nem egysoros, vagy 100 karakternél hosszabb
+  - `404` – a tanár már nem létezik, például közben törölték
 
 Közös hibák: `401` (nincs bejelentkezve), `403` (be van lépve, de nem tanár), `405` (rossz metódus).
 
