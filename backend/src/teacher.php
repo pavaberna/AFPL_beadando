@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 // Diáksorsoló - tanári lekérdezések: saját osztályok és az osztály névsora
 
+// A mai nap magyar idő szerint, a szerver időzóna-beállításától függetlenül. Ez dönti el, kit
+// húztak ki ma (napi egyszeri kihúzhatóság); éjfél után a tegnapi kihúzás már nem számít.
+function today(): string
+{
+    return (new DateTimeImmutable('now', new DateTimeZone('Europe/Budapest')))->format('Y-m-d');
+}
+
 // A tanárhoz rendelt osztályok névsor szerint.
 function listTeacherClasses(PDO $db, int $teacherId): array
 {
@@ -32,9 +39,11 @@ function teacherHasClass(PDO $db, int $teacherId, int $classId): ?bool
     return $assigned === false ? null : (bool) $assigned;
 }
 
-// Az osztály diákjai névsor szerint, az utolsó kihúzás dátumával (null, ha még nem húzták ki).
-function listClassStudents(PDO $db, int $classId): array
+// Az osztály diákjai névsor szerint, az utolsó kihúzás dátumával (null, ha még nem húzták ki) és azzal,
+// hogy ma kihúzták-e (drawn_today).
+function listClassStudents(PDO $db, int $classId, ?string $today = null): array
 {
+    $today ??= today();
     $stmt = $db->prepare(
         'SELECT s.id, s.name, s.weight, MAX(h.drawn_on) AS last_drawn_on
         FROM students s
@@ -45,7 +54,12 @@ function listClassStudents(PDO $db, int $classId): array
     );
     $stmt->execute([$classId]);
 
-    return array_map('normalizeTeacherRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
+    return array_map(function (array $row) use ($today): array {
+        $student = normalizeTeacherRow($row);
+        $student['drawn_today'] = $student['last_drawn_on'] === $today;
+
+        return $student;
+    }, $stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 // Az SQLite szövegként adja az azonosítókat és a számokat, ezeket egész számmá alakítjuk.
