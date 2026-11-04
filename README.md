@@ -90,6 +90,7 @@ Törlés (`DELETE`, a kérés törzse JSON: `{ "id": 1 }`):
 
 ### Teacher API
 
+Csak bejelentkezett tanár használhatja.
 A `teacher/classes.php`-t és a `teacher/draw.php`-t csak bejelentkezett tanár használhatja.
 
 - `GET teacher/classes.php`
@@ -99,6 +100,10 @@ A `teacher/classes.php`-t és a `teacher/draw.php`-t csak bejelentkezett tanár 
   - `400` – a `class_id` nem egész szám
   - `403` – az osztály másik tanárhoz tartozik
   - `404` – a megadott osztály nem létezik
+- `POST teacher/settings.php` (kérés: `display_name`) – a bejelentkezett tanár saját nevét módosítja
+  - `200` – `{ "user": { "id", "username", "display_name", "role" } }`
+  - `400` – hiányzó vagy üres név, illetve a név nem egysoros, vagy 100 karakternél hosszabb
+  - `404` – a tanár már nem létezik, például közben törölték
 - `POST teacher/draw.php` (kérés: `class_id`, `count` – hány diákot sorsoljon, `absent_ids` – a hiányzó diákok azonosítói, nem kötelező)
   - `201` – `{ "drawn_on": "2026-11-03", "students": [{ "id", "name", "weight" }] }` (a kisorsolt diákok a kihúzás sorrendjében, a `weight` már a csökkentett súly)
   - `200` – ugyanez a válasz üres `students` listával, ha ma senki sem sorsolható

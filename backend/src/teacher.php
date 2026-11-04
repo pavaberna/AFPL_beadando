@@ -2,7 +2,24 @@
 
 declare(strict_types=1);
 
-// Diáksorsoló - tanári lekérdezések: saját osztályok és az osztály névsora
+// Diáksorsoló - tanári műveletek: saját osztályok, az osztály névsora és a név módosítása
+
+const MAX_DISPLAY_NAME_LENGTH = 100;
+
+// Igaz, ha a név egysoros, és legalább 1, legfeljebb MAX_DISPLAY_NAME_LENGTH karakter hosszú.
+function isValidDisplayName(string $name): bool
+{
+    return preg_match('/^\P{Cc}{1,' . MAX_DISPLAY_NAME_LENGTH . '}\z/u', $name) === 1;
+}
+
+// A tanár megjelenített nevének módosítása. Hamis, ha nincs ilyen tanár, pl. mert közben törölték.
+function updateTeacherDisplayName(PDO $db, int $teacherId, string $displayName): bool
+{
+    $stmt = $db->prepare("UPDATE users SET display_name = ? WHERE id = ? AND role = 'teacher'");
+    $stmt->execute([$displayName, $teacherId]);
+
+    return $stmt->rowCount() > 0;
+}
 
 // A mai nap magyar idő szerint, a szerver időzóna-beállításától függetlenül. Ez dönti el, kit
 // húztak ki ma (napi egyszeri kihúzhatóság); éjfél után a tegnapi kihúzás már nem számít.

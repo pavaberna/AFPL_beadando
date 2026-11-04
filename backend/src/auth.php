@@ -57,6 +57,15 @@ function currentUser(): ?array
     return $_SESSION[SESSION_USER_KEY] ?? null;
 }
 
+// A sessionben tárolt név frissítése, hogy a me.php a következő belépés előtt is az újat adja vissza.
+// A hívó ellenőrzi, hogy van bejelentkezett felhasználó.
+function setCurrentUserDisplayName(string $displayName): array
+{
+    $_SESSION[SESSION_USER_KEY]['display_name'] = $displayName;
+
+    return $_SESSION[SESSION_USER_KEY];
+}
+
 // Igaz, ha van bejelentkezett felhasználó, és (ha megadtuk) a szerepköre egyezik.
 function isAuthorized(?string $role = null): bool
 {
