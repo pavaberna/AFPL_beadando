@@ -9,7 +9,7 @@ const MAX_DISPLAY_NAME_LENGTH = 100;
 // Igaz, ha a név egysoros, és legalább 1, legfeljebb MAX_DISPLAY_NAME_LENGTH karakter hosszú.
 function isValidDisplayName(string $name): bool
 {
-    return preg_match('/^.{1,' . MAX_DISPLAY_NAME_LENGTH . '}$/u', $name) === 1;
+    return preg_match('/^\P{Cc}{1,' . MAX_DISPLAY_NAME_LENGTH . '}\z/u', $name) === 1;
 }
 
 // A tanár megjelenített nevének módosítása. Hamis, ha nincs ilyen tanár, pl. mert közben törölték.
