@@ -90,15 +90,24 @@ Törlés (`DELETE`, a kérés törzse JSON: `{ "id": 1 }`):
 
 ### Teacher API
 
-`GET teacher/classes.php` – csak bejelentkezett tanár használhatja.
+A `teacher/classes.php`-t és a `teacher/draw.php`-t csak bejelentkezett tanár használhatja.
 
 - `GET teacher/classes.php`
   - `200` – `{ "classes": [{ "id", "name", "created_at" }] }` (a tanárhoz rendelt osztályok, névsorban)
 - `GET teacher/classes.php?class_id=1` (a `class_id` egész szám)
-  - `200` – `{ "classes": [...], "students": [{ "id", "name", "weight", "last_drawn_on" }] }`, a `last_drawn_on` `null`, ha a diákot még nem húzták ki
+  - `200` – `{ "classes": [...], "students": [{ "id", "name", "weight", "last_drawn_on", "drawn_today" }] }`, a `last_drawn_on` `null`, ha a diákot még nem húzták ki; a `drawn_today` `true`, ha ma már kihúzták (ma már nem sorsolható)
   - `400` – a `class_id` nem egész szám
   - `403` – az osztály másik tanárhoz tartozik
   - `404` – a megadott osztály nem létezik
+- `POST teacher/draw.php` (kérés: `class_id`, `count` – hány diákot sorsoljon, `absent_ids` – a hiányzó diákok azonosítói, nem kötelező)
+  - `201` – `{ "drawn_on": "2026-11-03", "students": [{ "id", "name", "weight" }] }` (a kisorsolt diákok a kihúzás sorrendjében, a `weight` már a csökkentett súly)
+  - `200` – ugyanez a válasz üres `students` listával, ha ma senki sem sorsolható
+  - `400` – a `class_id` nem egész szám, a `count` nem legalább 1 egész szám, vagy az `absent_ids` nem egész számokból álló lista
+  - `403` – az osztály nincs a tanárhoz rendelve
+  - `404` – a megadott osztály nem létezik
+  - `409` – közben egy másik sorsolás is futott ugyanabban az osztályban (például dupla kattintás), újra kell próbálni
+
+A sorsolás a hiányzókat és a ma már kihúzott diákokat kihagyja, a többiek közül a súlyukkal arányos eséllyel húz, egy diákot legfeljebb egyszer. Ha a `count` több, mint ahány diák ma sorsolható, annyit húz, ahányan vannak, ezért a `students` lista hossza adja a pörgetések számát. A kihúzott diákok súlya 1-gyel csökken (de 1 alá nem megy), és a mai dátum bekerül a kihúzási előzmények közé. A "mai nap" magyar idő (`Europe/Budapest`) szerint számít, a szerver beállításától függetlenül, és éjfél után a tegnap kihúzottak újra sorsolhatók. Vagy minden kihúzás rögzül, vagy egyik sem. A más osztályba tartozó `absent_ids` elemek nem számítanak.
 
 Közös hibák: `401` (nincs bejelentkezve), `403` (be van lépve, de nem tanár), `405` (rossz metódus).
 

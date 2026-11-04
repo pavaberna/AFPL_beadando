@@ -73,7 +73,7 @@ final class TeacherTest extends TestCase
         $students = listClassStudents($this->db, $this->classId('9.A'));
 
         $this->assertCount(4, $students);
-        $this->assertSame(['id', 'name', 'weight', 'last_drawn_on'], array_keys($students[0]));
+        $this->assertSame(['id', 'name', 'weight', 'last_drawn_on', 'drawn_today'], array_keys($students[0]));
         $this->assertSame('Horváth Lilla', $students[0]['name']);
         $this->assertSame(10, $students[0]['weight']);
         $this->assertIsInt($students[0]['id']);
@@ -85,6 +85,31 @@ final class TeacherTest extends TestCase
 
         $this->assertContains('Kiss Máté', $names);
         $this->assertNotContains('Nagy Péter', $names);
+    }
+
+    public function testTodayIsADateInHungarianTime(): void
+    {
+        $expected = (new DateTimeImmutable('now', new DateTimeZone('Europe/Budapest')))->format('Y-m-d');
+
+        $this->assertSame($expected, today());
+    }
+
+    public function testDrawnTodayIsTrueOnlyForStudentsDrawnOnTheGivenDay(): void
+    {
+        $students = listClassStudents($this->db, $this->classId('9.A'));
+        $this->db->exec("INSERT INTO draw_history (student_id, drawn_on) VALUES ({$students[0]['id']}, '2026-11-04')");
+        $this->db->exec("INSERT INTO draw_history (student_id, drawn_on) VALUES ({$students[1]['id']}, '2026-11-03')");
+
+        $students = listClassStudents($this->db, $this->classId('9.A'), '2026-11-04');
+
+        $this->assertSame([true, false, false, false], array_column($students, 'drawn_today'));
+    }
+
+    public function testDrawnTodayIsFalseWhenNeverDrawn(): void
+    {
+        $students = listClassStudents($this->db, $this->classId('9.A'));
+
+        $this->assertFalse($students[0]['drawn_today']);
     }
 
     public function testLastDrawnOnIsNullWhenNeverDrawn(): void
