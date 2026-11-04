@@ -49,6 +49,29 @@
             <div id="tanar-tartalom">
                 Tanári jogosultsággal bejelentkezve
             </div>
+
+            <dialog id="beallitasok-dialog" aria-labelledby="beallitasok-dialog-cim">
+                <h2 id="beallitasok-dialog-cim">Beállítások</h2>
+
+                <form id="beallitasok-urlap" autocomplete="off" novalidate>
+                    <p>
+                        <label for="beallitasok-nev">Név</label>
+                        <input
+                            type="text"
+                            id="beallitasok-nev"
+                            name="display_name"
+                            autocomplete="off"
+                        >
+                    </p>
+
+                    <p id="beallitasok-hiba" role="alert"></p>
+
+                    <div class="urlap-gombok">
+                        <button type="button" id="beallitasok-megse" class="megse">Mégse</button>
+                        <button type="submit">Mentés</button>
+                    </div>
+                </form>
+            </dialog>
         </div>
     </main>
 

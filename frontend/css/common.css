@@ -238,8 +238,9 @@ tr:last-of-type td:last-of-type {
 
 
 /* dialog ablak */
+#beallitasok-dialog,
 #porgetes-dialog,
-#tanar-dialog, 
+#tanar-dialog,
 #osztaly-dialog,
 #diak-dialog {
     width: min(28rem, 90vw);
@@ -249,12 +250,14 @@ tr:last-of-type td:last-of-type {
     border-radius: 0.75rem;
     margin:auto;
 }
+#beallitasok-dialog::backdrop,
 #porgetes-dialog::backdrop,
 #tanar-dialog::backdrop,
 #osztaly-dialog::backdrop,
 #diak-dialog::backdrop {
     background: rgb(0 0 0 / 50%);
 }
+#beallitasok-dialog label,
 #porgetes-dialog label,
 #tanar-urlap label,
 #osztaly-urlap label
@@ -262,6 +265,7 @@ tr:last-of-type td:last-of-type {
     display: block;
     margin-bottom: 0.4rem;
 }
+#beallitasok-dialog input,
 #porgetes-dialog input,
 #tanar-urlap input,
 #osztaly-urlap input,

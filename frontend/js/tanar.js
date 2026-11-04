@@ -5,6 +5,7 @@ import {
 
 import { osztalyokTartalma } from "./tanar/osztalyok.js";
 import { nevsorTartalma } from "./tanar/nevsor.js";
+import { beallitasokInditasa } from "./tanar/beallitasok.js";
 
 const tartalom = document.getElementById("tanar-tartalom");
 const osztalyokGomb = document.getElementById("osztalyok-gomb");
@@ -47,6 +48,8 @@ export function tanariFeluletInditasa() {
     menu.addEventListener("mouseleave", () => {
         menu.open = false;
     });
-    
+
+    beallitasokInditasa();
+
     return osztalyokMegnyitasa();
 }
