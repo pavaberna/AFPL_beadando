@@ -26,7 +26,7 @@ function urlapMegnyitasa(panel, cim, mezok, mentes, frissites, gombFelirat = "Me
     dialog.setAttribute("aria-labelledby", "nevsor-dialog-cim");
     dialog.innerHTML = `<h2 id="nevsor-dialog-cim">${htmlEscape(cim)}</h2>
         <form autocomplete="off">${mezok}<p role="alert"></p>
-            <div class="urlap-gombok"><button type="button">Mégse</button>
+            <div class="urlap-gombok"><button type="button" class="megse">Mégse</button>
             <button type="submit">${htmlEscape(gombFelirat)}</button></div>
         </form>`;
     panel.append(dialog);
