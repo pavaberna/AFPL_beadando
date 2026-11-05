@@ -26,7 +26,7 @@ function urlapMegnyitasa(panel, cim, mezok, mentes, frissites, gombFelirat = "Me
     dialog.setAttribute("aria-labelledby", "nevsor-dialog-cim");
     dialog.innerHTML = `<h2 id="nevsor-dialog-cim">${htmlEscape(cim)}</h2>
         <form autocomplete="off">${mezok}<p role="alert"></p>
-            <div class="urlap-gombok"><button type="button">Mégse</button>
+            <div class="urlap-gombok"><button type="button" class="megse">Mégse</button>
             <button type="submit">${htmlEscape(gombFelirat)}</button></div>
         </form>`;
     panel.append(dialog);
@@ -84,12 +84,9 @@ function nevsorMegnyitasa(osztalyId) {
     let sorszam = 0;
     let diakok, osztalyok, tanarok, osztaly;
     let importUzenet = "";
-    let nyitott = [false, false];
 
     async function frissites() {
         const keres = ++sorszam;
-        const reszek = panel.querySelectorAll("details");
-        if (reszek.length === 2) nyitott = Array.from(reszek, resz => resz.open);
         panel.textContent = "Névsor betöltése…";
         try {
             const adatok = await Promise.all([
@@ -120,17 +117,32 @@ function nevsorMegnyitasa(osztalyId) {
                 <td>${ikongomb("tanar-levalasztas", "delete", t.display_name + " hozzárendelésének törlése", Number(t.id))}</td></tr>`;
         }).join("");
         const vanSzabadTanar = szabadTanarok().length > 0;
-        panel.innerHTML = `<h2>${htmlEscape(osztaly.name)} – ${diakok.length ? diakok.length + " fő" : "Nincs tanuló"}</h2>
-            <details ${nyitott[0] ? "open" : ""}><summary>Osztálynévsor</summary><table class="card">
-            <thead><tr><th scope="col">Név</th><th scope="col">Info</th><th scope="col">
-            <button type="button" data-muvelet="nevsor-import">Névsor importálása</button>
-            ${ikongomb("diak-hozzaadas", "insert", "Új diák felvétele", osztalyId, `data-osztaly-nev="${htmlEscape(osztaly.name)}"`)}
-            </th></tr></thead><tbody>${diakSorok || '<tr><td colspan="3">Nincs tanuló.</td></tr>'}</tbody></table>
-            <p role="status">${htmlEscape(importUzenet)}</p></details>
-            <details ${nyitott[1] ? "open" : ""}><summary>Hozzárendelt tanárok</summary><table class="card">
-            <thead><tr><th scope="col">Felhasználónév</th><th scope="col">Tanár neve</th><th scope="col">
-            ${ikongomb("tanar-rendeles", "insert", vanSzabadTanar ? "Tanár hozzárendelése" : "Nincs hozzárendelhető tanár", osztalyId, vanSzabadTanar ? "" : "disabled")}
-            </th></tr></thead><tbody>${tanarSorok || '<tr><td colspan="3">Nincs hozzárendelt tanár.</td></tr>'}</tbody></table></details>`;
+        panel.innerHTML = `
+            <div class="nevsor-fejlec">
+                <h2>${htmlEscape(osztaly.name)} – ${diakok.length ? diakok.length + " fő" : "Nincs tanuló"}</h2>
+                <button type="button" data-muvelet="nevsor-import">Névsor importálása</button>
+            </div>
+            <p class="nevsor-import-uzenet" role="status">${htmlEscape(importUzenet)}</p>
+            <div class="nevsor-tablazatok">
+                <section>
+                    <h3>Osztálynévsor</h3>
+                    <table class="card">
+                        <thead><tr><th scope="col">Név</th><th scope="col">Info</th><th scope="col">
+                            ${ikongomb("diak-hozzaadas", "insert", "Új diák felvétele", osztalyId, `data-osztaly-nev="${htmlEscape(osztaly.name)}"`)}
+                        </th></tr></thead>
+                        <tbody>${diakSorok || '<tr><td colspan="3">Nincs tanuló.</td></tr>'}</tbody>
+                    </table>
+                </section>
+                <section>
+                    <h3>Hozzárendelt tanárok</h3>
+                    <table class="card">
+                        <thead><tr><th scope="col">Felhasználónév</th><th scope="col">Tanár neve</th><th scope="col">
+                            ${ikongomb("tanar-rendeles", "insert", vanSzabadTanar ? "Tanár hozzárendelése" : "Nincs hozzárendelhető tanár", osztalyId, vanSzabadTanar ? "" : "disabled")}
+                        </th></tr></thead>
+                        <tbody>${tanarSorok || '<tr><td colspan="3">Nincs hozzárendelt tanár.</td></tr>'}</tbody>
+                    </table>
+                </section>
+            </div>`;
     }
 
     function szabadTanarok() {

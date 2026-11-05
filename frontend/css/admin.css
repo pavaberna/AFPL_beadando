@@ -24,3 +24,33 @@ td:nth-child(5) {
     width: 60px;
 }
 
+/* Az osztály adatlapja */
+.nevsor-fejlec {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem var(--gap);
+    margin-block: var(--gap);
+}
+.nevsor-fejlec h2 {
+    padding: 0;
+    overflow-wrap: anywhere;
+}
+.nevsor-import-uzenet:not(:empty) {
+    margin-bottom: 1rem;
+}
+.nevsor-tablazatok {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    align-items: start;
+    gap: var(--gap);
+}
+.nevsor-tablazatok > section {
+    min-width: 0;
+}
+.nevsor-tablazatok table {
+    width: 100%;
+    margin: 0.75rem 0;
+    overflow-wrap: anywhere;
+}

@@ -51,7 +51,7 @@ function adatlapKirajzolasa(adatlap, tanar, osztalyok) {
                     ${szabad.map(o => `<option value="${htmlEscape(o.id)}">${htmlEscape(o.name)}</option>`).join("")}
                 </select></p>
                 <p role="alert"></p>
-                <div class="urlap-gombok"><button type="button">Mégse</button>
+                <div class="urlap-gombok"><button type="button" class="megse">Mégse</button>
                     <button type="submit" disabled>Hozzárendelés</button></div>
             </form>
         </dialog>

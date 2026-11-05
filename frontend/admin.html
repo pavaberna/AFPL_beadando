@@ -7,7 +7,8 @@
     <link rel="icon" href="./img/favicon.ico">
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/admin.css">
-    
+    <link id="tema-sotet" rel="stylesheet" href="css/tema-sotet.css" media="(prefers-color-scheme: dark)">
+    <script src="js/tema.js"></script>
     <script src="./js/api.js" defer></script>
     <script src="./js/auth.js" defer></script>
     <script type="module" src="./js/admin.js"></script>
@@ -30,9 +31,9 @@
 
             </nav>
             <div>
-                <img class="icon" src="img/admin.png" alt="">
+                <img class="icon" id="admin-icon" src="img/admin.png" alt="">
                 <span id="belepesi-allapot"></span>
-                <button class="btn-img" id="kijelentkezes" title="Kijelentkezés"><img class="icon" src="img/logout.png" alt=""></button>
+                <button class="btn-img" id="kijelentkezes" title="Kijelentkezés"><img class="icon" id="logout-icon"src="img/logout.png" alt=""></button>
             </div>
         </div>
     </header>
@@ -82,7 +83,7 @@
                     <p id="tanar-urlap-hiba" role="alert"></p>
 
                     <div class="urlap-gombok">
-                        <button type="button" id="tanar-megse">Mégse</button>
+                        <button type="button" id="tanar-megse" class="megse">Mégse</button>
                         <button type="submit">Mentés</button>
                     </div>
                 </form>
@@ -113,7 +114,7 @@
                     <p id="osztaly-urlap-hiba" role="alert"></p>
 
                     <div class="urlap-gombok">
-                        <button type="button" id="osztaly-megse">Mégse</button>
+                        <button type="button" id="osztaly-megse" class="megse">Mégse</button>
                         <button type="submit">Mentés</button>
                     </div>
                 </form>
@@ -142,7 +143,7 @@
                     <p id="diak-urlap-hiba" role="alert"></p>
 
                     <div class="urlap-gombok">
-                        <button type="button" id="diak-megse">Mégse</button>
+                        <button type="button" id="diak-megse" class="megse">Mégse</button>
                         <button type="submit">Mentés</button>
                     </div>
                 </form>
