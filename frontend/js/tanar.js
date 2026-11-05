@@ -65,7 +65,7 @@ async function nevsorMegnyitasa(osztaly) {
     eredmenyek.setAttribute("aria-live", "polite");
     function eredmenylistaMegnyitasa() {
         const cim = document.createElement("h2");
-        cim.textContent = `${osztaly.name} – Mai sorsolás`;
+        cim.textContent = `${osztaly.name} – Aktuális sorsolás`;
         hely.replaceChildren(cim, eredmenyek);
     }
     function nyertesMegjelenitese(diak) {
