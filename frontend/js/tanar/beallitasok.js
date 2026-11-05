@@ -24,12 +24,12 @@ export function beallitasokInditasa() {
     const megse = document.getElementById("beallitasok-megse");
     const mentes = urlap.querySelector('button[type="submit"]');
     const nevHelye = document.getElementById("belepesi-allapot");
-    const menu = document.querySelector("#top-nav details");
+    const beallitasokGomb = document.getElementById("beallitasok-gomb");
 
     let mentesFolyamatban = false;
 
-    document.getElementById("beallitasok-gomb").addEventListener("click", () => {
-        menu.open = false;
+    beallitasokGomb.addEventListener("click", () => {
+        beallitasokGomb.closest("details").open = false;
         mezo.value = nevHelye.textContent;
         ablak.showModal();
     });
