@@ -1,4 +1,4 @@
-import { porgetesBeallitasLetrehozasa, porgetesiMaximum } from "./porgetes.js";
+import { porgetesBeallitasLetrehozasa } from "./porgetes.js";
 
 export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
     const szakasz = document.createElement("section");
@@ -13,7 +13,7 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
 
     if (diakok.length === 0) {
         porgetes.letszamBeallitasa(0);
-        jelenletValtozott([], 0);
+        jelenletValtozott([]);
         return szakasz;
     }
 
@@ -61,9 +61,10 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
         const jelenlevok = diakok.filter(diak => !hianyzok.has(String(diak.id)));
         const jelenlevokSzama = jelenlevok.length;
         
-        const maximum = porgetesiMaximum(jelenlevok);
+        const sorsolhatok = jelenlevok.filter(diak => !diak.drawn_today);
+        const maximum = Math.max(0, sorsolhatok.length - 1);
         porgetes.letszamBeallitasa(maximum);
-        jelenletValtozott(jelenlevok, maximum, () => porgetesInditasa(maximum, hianyzok));
+        jelenletValtozott(sorsolhatok, () => porgetesInditasa(maximum, hianyzok));
         
         letszam.textContent =
             `Jelen van ${jelenlevokSzama} fő · Hiányzik ${hianyzok.size} fő`;

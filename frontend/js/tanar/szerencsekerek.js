@@ -1,15 +1,15 @@
 import { diakokSorsolasa } from "./adatok.js";
-import { minimumJelenlevo } from "./porgetes.js";
+import { minimumSorsolhato } from "./porgetes.js";
 
 const svgNevter = "http://www.w3.org/2000/svg";
 const sugar = 153;
 const feliratX = 324;
 
-export function kerekSzeletek(jelenlevok) {
-    if (jelenlevok.length < minimumJelenlevo) return [];
+export function kerekSzeletek(sorsolhatok) {
+    if (sorsolhatok.length < minimumSorsolhato) return [];
 
-    const meret = 360 / jelenlevok.length;
-    return jelenlevok.map((diak, index) => {
+    const meret = 360 / sorsolhatok.length;
+    return sorsolhatok.map((diak, index) => {
         const [vezeteknev, ...keresztnevek] = diak.name.trim().split(/\s+/);
         const kezdobetuk = keresztnevek.map(nev => nev[0].toLocaleUpperCase("hu") + ".");
         return {
@@ -88,8 +88,8 @@ export function szerencsekerekLetrehozasa(panel, {
     const gomb = panel.querySelector("button");
     gomb.onclick = null;
 
-    return function jelenlevokBeallitasa(jelenlevok, porgetesInditasa) {
-        const szeletek = kerekSzeletek(jelenlevok);
+    return function sorsolhatokBeallitasa(sorsolhatok, porgetesInditasa) {
+        const szeletek = kerekSzeletek(sorsolhatok);
         const feliratok = szeletekRajzolasa(tarcsa, szeletek);
         szogBeallitasa(tarcsa, feliratok, 0);
         let szog = 0;

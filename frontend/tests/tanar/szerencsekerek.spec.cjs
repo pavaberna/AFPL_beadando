@@ -71,16 +71,32 @@ for (const automatikus of [false, true]) {
         });
 }
 
-test("A ma már sorsoltak csak a pörgethető létszámot csökkentik", async ({ page }) => {
-    await tanariApi(page, diakok.map(diak => ({ ...diak, drawn_today: diak.id <= 2 })));
+test("Hat jelenlévőből három mai nyertes után nem indítható új sorsolás", async ({ page }) => {
+    const hatDiak = [...diakok, { id: 6, name: "Szabó Andrea" }];
+    await tanariApi(page, hatDiak.map(diak => ({ ...diak, drawn_today: diak.id <= 3 })));
+    await page.goto("/tanar.html");
+    await page.locator("#osztaly-menu summary").click();
+    await page.getByRole("button", { name: "9.A" }).click();
+    await expect(page.locator("#nevsor tbody tr")).toHaveCount(6);
+    await expect(page.locator("#porgetes-darab")).toBeDisabled();
+    await expect(page.locator("#kerek-porgetes")).toBeHidden();
+    await expect(page.locator("#kerek-uzenet")).toContainText("Ma még sorsolható: 3 fő");
+});
+
+test("Négy sorsolható diáknál három név húzható, a hiányzás ezt azonnal frissíti", async ({ page }) => {
+    await tanariApi(page, diakok.map(diak => ({ ...diak, drawn_today: diak.id === 1 })));
     await page.goto("/tanar.html");
     await page.locator("#osztaly-menu summary").click();
     await page.getByRole("button", { name: "9.A" }).click();
     await expect(page.locator("#porgetes-darab option")).toHaveText(["3"]);
-    await expect(page.locator(".kerek-szeletek text")).toHaveCount(5);
-    await page.getByLabel("Tóth Éva", { exact: true }).check();
+    await expect(page.locator(".kerek-szeletek text")).toHaveText(["Nagy P.", "Nagy P.", "Kerekes I.", "Tóth É."]);
+    await expect(page.getByLabel("Kiss Anna Edit", { exact: true })).toBeDisabled();
+    const hianyzik = page.getByLabel("Tóth Éva", { exact: true });
+    await hianyzik.check();
     await expect(page.locator("#kerek-porgetes")).toBeHidden();
-    await expect(page.locator("#kerek-uzenet")).toContainText("ma már nem sorsolható");
+    await hianyzik.uncheck();
+    await expect(page.locator("#kerek-porgetes")).toBeEnabled();
+    await expect(page.locator("#kerek-porgetes")).toBeVisible();
 });
 
 for (const status of [200, 409]) {

@@ -4,7 +4,7 @@ import {
 } from "./tanar/adatok.js";
 
 import { szerencsekerekLetrehozasa } from "./tanar/szerencsekerek.js";
-import { minimumJelenlevo, minimumPorgetes } from "./tanar/porgetes.js";
+import { minimumSorsolhato } from "./tanar/porgetes.js";
 import { nevsorTartalma } from "./tanar/nevsor.js";
 import { beallitasokInditasa } from "./tanar/beallitasok.js";
 
@@ -88,16 +88,15 @@ async function nevsorMegnyitasa(osztaly) {
         // Ha közben másik osztályt választottak, már annak a névsora számít.
         if (!hely.isConnected) return;
 
-        const nevsor = nevsorTartalma(osztaly, diakok, (jelenlevok, maximum, inditas) => {
-            let uzenet = jelenlevok.length < minimumJelenlevo
-                ? `A pörgetéshez legalább ${minimumJelenlevo} jelenlévő tanuló szükséges.`
-                : "";
-
-            if (!uzenet && maximum < minimumPorgetes) {
-                uzenet = "A jelenlévők közül ma már nem sorsolható ki legalább 3 tanuló.";
+        const nevsor = nevsorTartalma(osztaly, diakok, (sorsolhatok, inditas) => {
+            if (sorsolhatok.length < minimumSorsolhato) {
+                kerekAllapotFrissitese(
+                    `Ma még sorsolható: ${sorsolhatok.length} fő. A pörgetéshez legalább ${minimumSorsolhato} fő szükséges.`
+                );
+                return;
             }
-            kerekAllapotFrissitese(uzenet);
-            if (!uzenet) kerek(jelenlevok, inditas);
+            kerekAllapotFrissitese("");
+            kerek(sorsolhatok, inditas);
         });
 
         hely.replaceChildren(nevsor);
