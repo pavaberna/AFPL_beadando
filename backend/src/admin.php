@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 // Diáksorsoló - admin műveletek: tanár, osztály és diák felvétele
 
+// A diákok féléves kezdő súlya, megegyezik a students.weight oszlop alapértelmezett értékével.
+const INITIAL_STUDENT_WEIGHT = 10;
+
 // A megadott érték szóközök nélkül, ha nem üres szöveg, különben null.
 function cleanString(mixed $value): ?string
 {
@@ -333,6 +336,16 @@ function deleteStudent(PDO $db, int $id): void
 {
     $stmt = $db->prepare('DELETE FROM students WHERE id = ?');
     $stmt->execute([$id]);
+}
+
+// Új félév indulásakor minden diák súlyát visszaállítja a kezdőértékre, és visszaadja a diákok számát.
+// Egyetlen UPDATE, ezért vagy minden diáknál érvényesül, vagy egyiknél sem. Az előzmények megmaradnak.
+function resetAllWeights(PDO $db): int
+{
+    $stmt = $db->prepare('UPDATE students SET weight = ?');
+    $stmt->execute([INITIAL_STUDENT_WEIGHT]);
+
+    return $stmt->rowCount();
 }
 
 // Az összes osztály név szerint rendezve. A teachers az osztály összes tanára név szerint. A

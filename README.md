@@ -88,6 +88,12 @@ Törlés (`DELETE`, a kérés törzse JSON: `{ "id": 1 }`):
 - `DELETE admin/students.php` – a diák és a kihúzási előzményei törlődnek
   - Mindháromnál `200` – `{ "ok": true }`, `400` – hibás `id`, `404` – nem létezik
 
+Súlyok nullázása új félév indulásakor:
+
+- `POST admin/reset-weights.php` (a kérésnek nincs törzse)
+  - `200` – `{ "ok": true, "reset_count": 8 }`, a `reset_count` az összes diák száma
+  - Minden osztály minden diákjának a súlya 10 lesz. A kihúzási előzmények megmaradnak, ezért aki ma már ki lett húzva, az aznap nem sorsolható újra.
+
 ### Teacher API
 
 Csak bejelentkezett tanár használhatja.
