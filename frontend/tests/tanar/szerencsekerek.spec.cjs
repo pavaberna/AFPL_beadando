@@ -54,7 +54,7 @@ for (const automatikus of [false, true]) {
             const eredmenyek = page.locator("#tanar-tartalom ol li");
             await expect(eredmenyek).toHaveCount(0);
             await gomb.click();
-            await expect(page.getByRole("heading", { name: "9.A – Mai sorsolás" })).toBeVisible();
+            await expect(page.getByRole("heading", { name: "9.A – Aktuális sorsolás" })).toBeVisible();
             await expect(page.locator("#nevsor")).toHaveCount(0);
             if (automatikus) {
                 await expect(gomb).toBeDisabled();
