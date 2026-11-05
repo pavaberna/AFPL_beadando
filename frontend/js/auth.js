@@ -71,10 +71,17 @@ async function belepesEllenorzese() {
         cache: "no-store",
 
         onSuccess: async (data) => {
-            const tanariOldal = document.body.dataset.oldal === "tanar";
+            const oldal = document.body.dataset.oldal;
+            const tanariOldal = oldal === "tanar";
 
             if (tanariOldal && data.user.role !== "teacher") {
                 alert("Ez az oldal csak tanárként érhető el.");
+                window.location.replace("index.html");
+                return;
+            }
+
+            if (oldal === "admin" && data.user.role !== "admin") {
+                alert("Ez az oldal csak adminként érhető el.");
                 window.location.replace("index.html");
                 return;
             }
