@@ -31,30 +31,6 @@
     --line-height: 24px;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        color-scheme: dark;
-        --color-background: #162433;
-        --color-surface: #213448;
-        --color-text: #eaf1f6;
-        --color-border: #87a2b2;
-        --color-nav-background: #253d52;
-        --color-nav-text: #eaf1f6;
-        --color-success: #80cebb;
-        --color-danger: #ff9c8e;
-        --color-shadow: #0008;
-        --color-light: #607c8a;
-    }
-
-    body[data-oldal="tanar"] #top-nav .lenyilo-menu {
-        background-color: var(--color-nav-background);
-    }
-
-    #top-header .logo {
-        content: url("../img/logo-vilagos.svg");
-    }
-}
-
 /* általános */
 
 * {
@@ -286,7 +262,7 @@ tr:last-of-type td:last-of-type {
 dialog {
     width: min(28rem, 90vw);
     padding: 1.5rem;
-    border: none;
+    border: var(--border-thin);
     border-radius: 0.75rem;
     margin: auto;
     background-color: var(--color-surface);

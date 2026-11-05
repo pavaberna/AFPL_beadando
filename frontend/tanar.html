@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/tanar.css">
     <link rel="stylesheet" href="./css/szerencsekerek.css">
-    
+    <link id="tema-sotet" rel="stylesheet" href="css/tema-sotet.css" media="(prefers-color-scheme: dark)">
+    <script src="js/tema.js"></script>  
     <script src="./js/api.js" defer></script>
     <script src="./js/auth.js" defer></script>
 </head>
@@ -28,7 +29,7 @@
             </details>
             <details>
                 <summary>  
-                    <img class="icon" src="img/teacher.png" alt="">
+                    <img class="icon" id="teacher-icon" src="img/teacher.png" alt="">
                     <span id="belepesi-allapot"></span>        
                 </summary>
                 <div class="lenyilo-menu">
@@ -74,7 +75,15 @@
                             autocomplete="off"
                         >
                     </p>
-
+                    <p>
+                        <label for="beallitasok-tema">Megjelenés</label>
+                        <select id="beallitasok-tema" name="tema">
+                            <option value="default" selected>Alapértelmezett</option>
+                            <option value="light">Világos</option>
+                            <option value="dark">Sötét</option>
+                            <option value="colorful">Színes</option>
+                        </select>
+                    </p>
                     <p id="beallitasok-hiba" role="alert"></p>
 
                     <div class="urlap-gombok">

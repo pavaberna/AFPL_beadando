@@ -1,0 +1,25 @@
+:root {
+    color-scheme: dark;
+    --color-background: #162433;
+    --color-surface: #213448;
+    --color-text: #eaf1f6;
+    --color-border: #87a2b2;
+    --color-nav-background: #253d52;
+    --color-nav-text: #eaf1f6;
+    --color-success: #80cebb;
+    --color-danger: #ff9c8e;
+    --color-shadow: #0008;
+    --color-light: #607c8a;
+
+    --kerek-szelet-3: #1D334C;
+    --kerek-perem: #82CAED;
+    --kerek-felirat-3: #EEEEEF;
+}
+
+body[data-oldal="tanar"] #top-nav .lenyilo-menu {
+    background-color: var(--color-nav-background);
+}
+
+#top-header .logo {
+    content: url("../img/logo-vilagos.svg");
+}
