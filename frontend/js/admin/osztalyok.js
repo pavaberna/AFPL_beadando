@@ -1,8 +1,11 @@
+import "./osztaly-nevsor.js";
 import { htmlEscape } from "./kozos.js";
 import {
     tanarokLekerese,
     osztalyokLekerese,
-    osztalyHozzaadasa
+    osztalyHozzaadasa,
+    osztalyAtnevezese,
+    osztalyTorlese
 } from "./adatok.js";
 
 export function osztalyokTartalma(osztalyok) {
@@ -16,34 +19,24 @@ export function osztalyokTartalma(osztalyok) {
         ).slice(0, 10);
 
         return `
-            <tr>
-                <td>${htmlEscape(osztaly.name)}</td>
-                <td>?</td>
-                <td>${htmlEscape(felvetelDatuma)}</td>
-
+            <tr data-id="${htmlEscape(osztaly.id)}" data-nev="${htmlEscape(osztaly.name)}">
                 <td>
-                    <button
-                        type="button"
-                        class="btn-img"
-                        data-muvelet="diak-hozzaadas"
-                        data-id="${htmlEscape(osztaly.id)}"
-                        data-osztaly-nev="${htmlEscape(osztaly.name)}"
-                        title="Új diák felvétele"
-                        aria-label="Új diák felvétele"
-                    >
-                        <img class="icon" src="img/insert.png" alt="">
+                    <button type="button" class="btn-img" data-muvelet="osztaly-atnevezes"
+                        title="Átnevezés" aria-label="${htmlEscape(osztaly.name)} átnevezése">
+                        <img class="icon" src="img/update.png" alt="">
                     </button>
                 </td>
-
+                <td>${htmlEscape(osztaly.name)}</td>
+                <td>${htmlEscape(felvetelDatuma)}</td>
                 <td>
-                    <button
-                        type="button"
-                        class="btn-img"
-                        data-muvelet="osztaly-torles"
-                        data-id="${htmlEscape(osztaly.id)}"
-                        title="Törlés"
-                        aria-label="Osztály törlése"
-                    >
+                    <button type="button" class="btn-img" data-muvelet="osztaly-info" data-osztaly-id="${htmlEscape(osztaly.id)}"
+                        title="Osztály adatai" aria-label="${htmlEscape(osztaly.name)} adatai">
+                        <img class="icon" src="img/info.png" alt="">
+                    </button>
+                </td>
+                <td>
+                    <button type="button" class="btn-img" data-muvelet="osztaly-torles"
+                        title="Törlés" aria-label="${htmlEscape(osztaly.name)} törlése">
                         <img class="icon" src="img/delete.png" alt="">
                     </button>
                 </td>
@@ -57,10 +50,10 @@ export function osztalyokTartalma(osztalyok) {
         <table class="card">
             <thead>
                 <tr>
-                    <th scope="col">Osztály</th>
-                    <th scope="col">Tanár? Létszám?</th>
+                    <th scope="col">Módosítás</th>
+                    <th scope="col">Osztály neve</th>
                     <th scope="col">Felvéve</th>
-                    <th scope="col"></th>
+                    <th scope="col">Info</th>
                     <th scope="col">
                         <button
                             type="button"
@@ -96,6 +89,57 @@ const osztalyMegse = document.querySelector("#osztaly-megse");
 let osztalyMentesFolyamatban = false;
 
 
+const osztalyCim = document.querySelector("#osztaly-dialog-cim");
+const osztalyNev = document.querySelector("#osztaly-name");
+let modositottOsztalyId = null;
+
+function urlapMegnyitasa(sor = null) {
+    modositottOsztalyId = sor ? Number(sor.dataset.id) : null;
+    osztalyUrlap.reset();
+    osztalyUrlapHiba.textContent = "";
+    osztalyCim.textContent = sor ? "Osztály átnevezése" : "Új osztály felvétele";
+    osztalyTanarSelect.closest("p").hidden = Boolean(sor);
+    osztalyTanarSelect.disabled = Boolean(sor);
+    osztalyNev.value = sor?.dataset.nev ?? "";
+    osztalyDialog.showModal();
+    osztalyNev.focus();
+}
+
+document.addEventListener("click", event => {
+    const gomb = event.target.closest('[data-muvelet="osztaly-atnevezes"]');
+    if (gomb) urlapMegnyitasa(gomb.closest("tr"));
+});
+
+async function listaFrissitese(tablazat) {
+    try {
+        const osztalyok = await osztalyokLekerese();
+        if (tablazat?.isConnected) osztalyokTartalma(osztalyok);
+    } catch {
+        alert("A művelet sikerült, de a lista nem frissült. Nyisd meg újra az Osztályok menüpontot.");
+    }
+}
+
+document.addEventListener("click", async event => {
+    const gomb = event.target.closest('[data-muvelet="osztaly-torles"]');
+    if (!gomb || gomb.disabled) return;
+
+    const sor = gomb.closest("tr");
+    const tablazat = gomb.closest("table");
+    const uzenet = `Törlöd a(z) ${sor.dataset.nev} osztályt?\n` +
+        "Az osztály összes diákja és a hozzájuk tartozó sorsolási előzmények is törlődnek. A tanárok megmaradnak.";
+    if (!window.confirm(uzenet)) return;
+
+    gomb.disabled = true;
+    try {
+        await osztalyTorlese(Number(sor.dataset.id));
+    } catch (hiba) {
+        alert(hiba.message || "Nem sikerült törölni az osztályt.");
+        gomb.disabled = false;
+        return;
+    }
+    await listaFrissitese(tablazat);
+});
+
 // A hozzáadásgomb megnyitja az űrlapot.
 document.addEventListener("click", async event => {
     const gomb = event.target.closest(
@@ -111,8 +155,6 @@ document.addEventListener("click", async event => {
         // A korábban lekért tanárlistát is fel tudja használni.
         const tanarok = await tanarokLekerese();
 
-        osztalyUrlap.reset();
-        osztalyUrlapHiba.textContent = "";
 
         // Minden megnyitáskor újra összeállítjuk a választékot.
         osztalyTanarSelect.replaceChildren(
@@ -126,7 +168,7 @@ document.addEventListener("click", async event => {
             osztalyTanarSelect.append(opcio);
         });
 
-        osztalyDialog.showModal();
+        if (gomb.isConnected) urlapMegnyitasa();
     } catch (error) {
         console.error("A tanárok nem tölthetők be.", error);
         alert("Nem sikerült betölteni a tanárokat. Próbáld újra!");
@@ -181,7 +223,7 @@ osztalyUrlap.addEventListener("submit", async event => {
     const tanarAzonosito = mezok.get("teacher_id");
 
     // Csak kiválasztott tanár esetén küldünk teacher_id mezőt.
-    if (tanarAzonosito !== "") {
+    if (modositottOsztalyId === null && tanarAzonosito !== "") {
         const teacherId = Number(tanarAzonosito);
 
         if (!Number.isSafeInteger(teacherId)) {
@@ -204,30 +246,22 @@ osztalyUrlap.addEventListener("submit", async event => {
     mentesGomb.textContent = "Mentés…";
 
     try {
-        await osztalyHozzaadasa(adatok);
-
-        // Csak sikeres mentés után zárjuk be.
-        osztalyDialog.close();
-
-        try {
-            const osztalyok = await osztalyokLekerese();
-            osztalyokTartalma(osztalyok);
-        } catch (error) {
-            console.error("Az osztálylista nem frissíthető.", error);
-
-            alert(
-                "Az osztály felvétele sikerült, de a lista nem frissült. " +
-                "Nyisd meg újra az Osztályok menüpontot."
-            );
+        const tablazat = document.querySelector("#admin-tartalom table");
+        if (modositottOsztalyId === null) {
+            await osztalyHozzaadasa(adatok);
+        } else {
+            await osztalyAtnevezese(modositottOsztalyId, adatok.name);
         }
+        osztalyDialog.close();
+        await listaFrissitese(tablazat);
     } catch (error) {
         if (error.status === 409) {
             osztalyUrlapHiba.textContent =
                 "Ez az osztálynév már foglalt. Válassz másikat!";
         } else if (error.status === 404) {
             osztalyUrlapHiba.textContent =
-                "A kiválasztott tanár már nem létezik. " +
-                "Válassz másikat vagy a tanár nélküli lehetőséget!";
+                modositottOsztalyId !== null ? "Az osztály már nem létezik." :
+                "A kiválasztott tanár már nem létezik. Válassz másikat!";
         } else {
             osztalyUrlapHiba.textContent =
                 error.message || "Nem sikerült elmenteni az osztályt.";

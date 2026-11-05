@@ -6,6 +6,7 @@ const diakOsztalyNev = document.querySelector("#diak-osztaly-nev");
 const diakUrlapHiba = document.querySelector("#diak-urlap-hiba");
 const diakMegse = document.querySelector("#diak-megse");
 
+let megnyitoGomb;
 let kivalasztottOsztalyId = null;
 let diakMentesFolyamatban = false;
 
@@ -28,6 +29,7 @@ document.addEventListener("click", event => {
         return;
     }
 
+    megnyitoGomb = gomb;
     kivalasztottOsztalyId = osztalyId;
 
     diakUrlap.reset();
@@ -105,7 +107,7 @@ diakUrlap.addEventListener("submit", async event => {
         await diakHozzaadasa(adatok);
 
         diakDialog.close();
-        alert("A diák felvétele sikerült.");
+        megnyitoGomb.dispatchEvent(new Event("nevsor-frissites", { bubbles: true }));
     } catch (error) {
         if (error.status === 404) {
             diakUrlapHiba.textContent =

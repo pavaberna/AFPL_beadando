@@ -22,8 +22,12 @@ async function apiRequest({
                 throw new Error("GET és HEAD kéréshez nem küldhető törzs.");
             }
 
-            options.headers["Content-Type"] = "application/json";
-            options.body = JSON.stringify(data);
+            if (data instanceof FormData) {
+                options.body = data;
+            } else {
+                options.headers["Content-Type"] = "application/json";
+                options.body = JSON.stringify(data);
+            }
         }
 
         const response = await fetch(url, options);

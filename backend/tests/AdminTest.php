@@ -101,6 +101,69 @@ final class AdminTest extends TestCase
 
         $this->assertSame('12.D', $class['name']);
         $this->assertSame($teacher['id'], $class['teacher_id']);
+        $this->assertSame(['id', 'name', 'teacher_id', 'created_at'], array_keys($class));
+        $this->assertSame(1, $this->countLinks($teacher['id'], $class['id']));
+    }
+
+    public function testCreateClassWithoutTeacherCreatesNoLink(): void
+    {
+        $class = createClass($this->db, '12.D', null);
+
+        $links = $this->db->query("SELECT COUNT(*) FROM teacher_classes WHERE class_id = {$class['id']}");
+
+        $this->assertSame(0, (int) $links->fetchColumn());
+    }
+
+    public function testClassCanBelongToSeveralTeachersAndViceVersa(): void
+    {
+        $first = createTeacher($this->db, 'elso', 'titok123', 'Első Tanár');
+        $second = createTeacher($this->db, 'masodik', 'titok123', 'Második Tanár');
+        $classA = createClass($this->db, '12.D', $first['id']);
+        $classB = createClass($this->db, '12.E', $first['id']);
+        $this->db->exec("INSERT INTO teacher_classes (teacher_id, class_id) VALUES ({$second['id']}, {$classA['id']})");
+
+        $this->assertSame(1, $this->countLinks($first['id'], $classA['id']));
+        $this->assertSame(1, $this->countLinks($first['id'], $classB['id']));
+        $this->assertSame(1, $this->countLinks($second['id'], $classA['id']));
+    }
+
+    public function testSameAssignmentCannotBeStoredTwice(): void
+    {
+        $teacher = createTeacher($this->db, 'elso', 'titok123', 'Első Tanár');
+        $class = createClass($this->db, '12.D', $teacher['id']);
+
+        $this->expectException(PDOException::class);
+        $this->db->exec("INSERT INTO teacher_classes (teacher_id, class_id) VALUES ({$teacher['id']}, {$class['id']})");
+    }
+
+    public function testDeletingTeacherRemovesLinksButKeepsClass(): void
+    {
+        $teacher = createTeacher($this->db, 'elso', 'titok123', 'Első Tanár');
+        $class = createClass($this->db, '12.D', $teacher['id']);
+
+        $this->db->exec("DELETE FROM users WHERE id = {$teacher['id']}");
+
+        $this->assertSame(0, $this->countLinks($teacher['id'], $class['id']));
+        $this->assertTrue(classExists($this->db, $class['id']));
+    }
+
+    public function testDeletingClassRemovesLinksButKeepsOtherTeachers(): void
+    {
+        $teacher = createTeacher($this->db, 'elso', 'titok123', 'Első Tanár');
+        $class = createClass($this->db, '12.D', $teacher['id']);
+
+        $this->db->exec("DELETE FROM classes WHERE id = {$class['id']}");
+
+        $this->assertSame(0, $this->countLinks($teacher['id'], $class['id']));
+        $this->assertTrue(teacherExists($this->db, $teacher['id']));
+    }
+
+    private function countLinks(int $teacherId, int $classId): int
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM teacher_classes WHERE teacher_id = ? AND class_id = ?');
+        $stmt->execute([$teacherId, $classId]);
+
+        return (int) $stmt->fetchColumn();
     }
 
     public function testCreateClassWithoutTeacher(): void

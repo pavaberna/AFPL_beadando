@@ -14,12 +14,20 @@ CREATE TABLE IF NOT EXISTS users (
     created_at    TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Osztályok (csoportok), egy tanárhoz rendelve
+-- Osztályok (csoportok). A tanárokhoz rendelést a teacher_classes tábla tárolja; a teacher_id
+-- oszlop a korábbi modellből maradt, a kód már nem használja (az eldobása külön jegy).
 CREATE TABLE IF NOT EXISTS classes (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     name       TEXT    NOT NULL UNIQUE,
     teacher_id INTEGER REFERENCES users (id) ON DELETE SET NULL,
     created_at TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tanár–osztály kapcsolat: egy tanárhoz több osztály, egy osztályhoz több tanár tartozhat
+CREATE TABLE IF NOT EXISTS teacher_classes (
+    teacher_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    class_id   INTEGER NOT NULL REFERENCES classes (id) ON DELETE CASCADE,
+    PRIMARY KEY (teacher_id, class_id)
 );
 
 -- Diákok; a weight a féléves valószínűségi mutató (alapértelmezett 10, minimum 1)
@@ -41,5 +49,6 @@ CREATE TABLE IF NOT EXISTS draw_history (
 );
 
 CREATE INDEX IF NOT EXISTS idx_classes_teacher_id ON classes (teacher_id);
+CREATE INDEX IF NOT EXISTS idx_teacher_classes_class_id ON teacher_classes (class_id);
 CREATE INDEX IF NOT EXISTS idx_students_class_id ON students (class_id);
 CREATE INDEX IF NOT EXISTS idx_draw_history_drawn_on ON draw_history (drawn_on);

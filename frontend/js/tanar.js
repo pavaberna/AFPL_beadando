@@ -6,6 +6,7 @@ import {
 import { szerencsekerekLetrehozasa } from "./tanar/szerencsekerek.js";
 import { minimumJelenlevo } from "./tanar/porgetes.js";
 import { nevsorTartalma } from "./tanar/nevsor.js";
+import { beallitasokInditasa } from "./tanar/beallitasok.js";
 
 const tartalom = document.getElementById("tanar-tartalom");
 const kerekPanel = document.getElementById("kerek-tartalom");
@@ -107,5 +108,6 @@ export function tanariFeluletInditasa() {
         });
     }
 
+    beallitasokInditasa();
     return osztalyValasztoBetoltese();
 }

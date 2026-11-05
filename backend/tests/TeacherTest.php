@@ -46,7 +46,9 @@ final class TeacherTest extends TestCase
             "INSERT INTO users (username, password_hash, display_name, role) VALUES ('masik', 'x', 'Másik', 'teacher')"
         );
         $otherId = (int) $this->db->lastInsertId();
-        $this->db->exec("INSERT INTO classes (name, teacher_id) VALUES ('11.C', $otherId)");
+        $this->db->exec("INSERT INTO classes (name) VALUES ('11.C')");
+        $newClassId = $this->classId('11.C');
+        $this->db->exec("INSERT INTO teacher_classes (teacher_id, class_id) VALUES ($otherId, $newClassId)");
 
         $classes = listTeacherClasses($this->db, $this->teacherId());
 
@@ -71,7 +73,7 @@ final class TeacherTest extends TestCase
         $students = listClassStudents($this->db, $this->classId('9.A'));
 
         $this->assertCount(4, $students);
-        $this->assertSame(['id', 'name', 'weight', 'last_drawn_on'], array_keys($students[0]));
+        $this->assertSame(['id', 'name', 'weight', 'last_drawn_on', 'drawn_today'], array_keys($students[0]));
         $this->assertSame('Horváth Lilla', $students[0]['name']);
         $this->assertSame(10, $students[0]['weight']);
         $this->assertIsInt($students[0]['id']);
@@ -83,6 +85,31 @@ final class TeacherTest extends TestCase
 
         $this->assertContains('Kiss Máté', $names);
         $this->assertNotContains('Nagy Péter', $names);
+    }
+
+    public function testTodayIsADateInHungarianTime(): void
+    {
+        $expected = (new DateTimeImmutable('now', new DateTimeZone('Europe/Budapest')))->format('Y-m-d');
+
+        $this->assertSame($expected, today());
+    }
+
+    public function testDrawnTodayIsTrueOnlyForStudentsDrawnOnTheGivenDay(): void
+    {
+        $students = listClassStudents($this->db, $this->classId('9.A'));
+        $this->db->exec("INSERT INTO draw_history (student_id, drawn_on) VALUES ({$students[0]['id']}, '2026-11-04')");
+        $this->db->exec("INSERT INTO draw_history (student_id, drawn_on) VALUES ({$students[1]['id']}, '2026-11-03')");
+
+        $students = listClassStudents($this->db, $this->classId('9.A'), '2026-11-04');
+
+        $this->assertSame([true, false, false, false], array_column($students, 'drawn_today'));
+    }
+
+    public function testDrawnTodayIsFalseWhenNeverDrawn(): void
+    {
+        $students = listClassStudents($this->db, $this->classId('9.A'));
+
+        $this->assertFalse($students[0]['drawn_today']);
     }
 
     public function testLastDrawnOnIsNullWhenNeverDrawn(): void
@@ -104,14 +131,35 @@ final class TeacherTest extends TestCase
         $this->assertCount(4, $students);
     }
 
-    public function testFindClassOwner(): void
+    public function testTeacherHasClass(): void
     {
-        $classId = $this->classId('9.A');
+        $this->assertTrue(teacherHasClass($this->db, $this->teacherId(), $this->classId('9.A')));
+    }
 
-        $this->assertSame(
-            ['id' => $classId, 'teacher_id' => $this->teacherId()],
-            findClassOwner($this->db, $classId)
+    public function testTeacherHasNoAccessToUnassignedClass(): void
+    {
+        $this->db->exec("INSERT INTO classes (name) VALUES ('11.C')");
+
+        $this->assertFalse(teacherHasClass($this->db, $this->teacherId(), $this->classId('11.C')));
+    }
+
+    public function testTeacherHasClassIsNullForMissingClass(): void
+    {
+        $this->assertNull(teacherHasClass($this->db, $this->teacherId(), 999));
+    }
+
+    public function testSameClassIsListedForEveryAssignedTeacher(): void
+    {
+        $this->db->exec(
+            "INSERT INTO users (username, password_hash, display_name, role) VALUES ('masik', 'x', 'Másik', 'teacher')"
         );
-        $this->assertNull(findClassOwner($this->db, 999));
+        $otherId = (int) $this->db->lastInsertId();
+        $classId = $this->classId('9.A');
+        $this->db->exec("INSERT INTO teacher_classes (teacher_id, class_id) VALUES ($otherId, $classId)");
+
+        $this->assertSame(['9.A'], array_column(listTeacherClasses($this->db, $otherId), 'name'));
+        $this->assertContains('9.A', array_column(listTeacherClasses($this->db, $this->teacherId()), 'name'));
+        $this->assertTrue(teacherHasClass($this->db, $otherId, $classId));
+        $this->assertTrue(teacherHasClass($this->db, $this->teacherId(), $classId));
     }
 }
