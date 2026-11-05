@@ -18,6 +18,7 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
     }
 
     const letszam = document.createElement("p");
+    letszam.classList.add("nevsor-letszam");
     letszam.setAttribute("aria-live", "polite");
 
     const tabla = document.createElement("table");
@@ -39,7 +40,7 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
         const hianyzikCella = sor.insertCell();
         const nevCella = sor.insertCell();
         const datumCella = sor.insertCell();
-        datumCella.textContent = diak.last_drawn_on ?? "Még nem volt";
+        datumCella.textContent = diak.drawn_today ? "ma" : (diak.last_drawn_on ?? "Még nem volt");
 
         const jelolo = document.createElement("input");
         jelolo.type = "checkbox";
@@ -83,7 +84,7 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
     torzs.addEventListener("change", letszamFrissitese);
     letszamFrissitese();
 
-    szakasz.append(letszam, porgetes.elem, tabla);
+    szakasz.append(porgetes.elem, letszam, tabla);
 
     return szakasz;
 }

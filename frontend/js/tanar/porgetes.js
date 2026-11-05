@@ -3,9 +3,11 @@ export const minimumPorgetes = 3;
 export const minimumSorsolhato = minimumPorgetes + 1;
 
 export function porgetesBeallitasLetrehozasa() {
-    const elem = document.createElement("div");
+    const elem = document.createElement("fieldset");
+    elem.classList.add("porgetes-beallitasok");
 
     elem.innerHTML = `
+        <legend>Pörgetés beállításai</legend>
         <label>
             Pörgetések száma:
             <select id="porgetes-darab"></select>
