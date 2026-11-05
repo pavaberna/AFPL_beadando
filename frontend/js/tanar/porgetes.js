@@ -1,5 +1,12 @@
 export const minimumJelenlevo = 4;
 
+export const minimumPorgetes = 3;
+
+export function porgetesiMaximum(jelenlevok) {
+    const sorsolhatok = jelenlevok.filter(diak => !diak.drawn_today);
+    return Math.max(0, Math.min(jelenlevok.length - 1, sorsolhatok.length));
+}
+
 export function porgetesBeallitasLetrehozasa() {
     const elem = document.createElement("div");
 
@@ -20,10 +27,9 @@ export function porgetesBeallitasLetrehozasa() {
     const automatikus = elem.querySelector("input");
     const uzenet = elem.querySelector("p");
 
-    function letszamBeallitasa(jelenlevokSzama) {
-        const maximum = jelenlevokSzama - 1;
-        const kevesenVannak = jelenlevokSzama < minimumJelenlevo;
-        const elozoErtek = Number(valaszto.value) || 3;
+    function letszamBeallitasa(maximum) {
+        const kevesenVannak = maximum < minimumPorgetes;
+        const elozoErtek = Number(valaszto.value) || minimumPorgetes;
 
         cimke.hidden = kevesenVannak;
         automatikus.parentElement.hidden = kevesenVannak;
@@ -34,16 +40,16 @@ export function porgetesBeallitasLetrehozasa() {
 
         if (kevesenVannak) return;
 
-        for (let darab = 3; darab <= maximum; darab++) {
+        for (let darab = minimumPorgetes; darab <= maximum; darab++) {
             valaszto.add(new Option(darab, darab));
         }
 
         valaszto.value = Math.min(elozoErtek, maximum);
     }
 
-    function beallitasokRogzitese(jelenlevokSzama) {
+    function beallitasokRogzitese(maximum) {
         const darab = Number(valaszto.value);
-        if (!Number.isInteger(darab) || darab < 3 || darab >= jelenlevokSzama) {
+        if (!Number.isInteger(darab) || darab < minimumPorgetes || darab > maximum) {
             valaszto.setCustomValidity("Legalább 3 nevet válassz, és legalább egy jelenlévő maradjon ki.");
             valaszto.reportValidity();
             valaszto.setCustomValidity("");

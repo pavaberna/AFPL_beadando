@@ -1,4 +1,4 @@
-import { porgetesBeallitasLetrehozasa } from "./porgetes.js";
+import { porgetesBeallitasLetrehozasa, porgetesiMaximum } from "./porgetes.js";
 
 export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
     const szakasz = document.createElement("section");
@@ -13,7 +13,7 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
 
     if (diakok.length === 0) {
         porgetes.letszamBeallitasa(0);
-        jelenletValtozott([]);
+        jelenletValtozott([], 0);
         return szakasz;
     }
 
@@ -46,6 +46,7 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
         jelolo.id = `hianyzik-${diak.id}`;
         jelolo.name = "hianyzok";
         jelolo.value = diak.id;
+        jelolo.disabled = diak.drawn_today === true;
 
         const nev = document.createElement("label");
         nev.htmlFor = jelolo.id;
@@ -60,21 +61,22 @@ export function nevsorTartalma(osztaly, diakok, jelenletValtozott) {
         const jelenlevok = diakok.filter(diak => !hianyzok.has(String(diak.id)));
         const jelenlevokSzama = jelenlevok.length;
         
-        porgetes.letszamBeallitasa(jelenlevokSzama);
-        jelenletValtozott(jelenlevok, porgetesInditasa);
+        const maximum = porgetesiMaximum(jelenlevok);
+        porgetes.letszamBeallitasa(maximum);
+        jelenletValtozott(jelenlevok, maximum, () => porgetesInditasa(maximum, hianyzok));
         
         letszam.textContent =
             `Jelen van ${jelenlevokSzama} fő · Hiányzik ${hianyzok.size} fő`;
     }
 
-    function porgetesInditasa(elerheto) {
-        const beallitasok = porgetes.beallitasokRogzitese(elerheto);
+    function porgetesInditasa(maximum, hianyzok) {
+        const beallitasok = porgetes.beallitasokRogzitese(maximum);
         if (!beallitasok) return null;
 
         for (const jelolo of torzs.querySelectorAll("input")) {
             jelolo.disabled = true;
         }
-        return beallitasok;
+        return { ...beallitasok, hianyzok: Array.from(hianyzok, Number) };
     }
 
     torzs.addEventListener("change", letszamFrissitese);

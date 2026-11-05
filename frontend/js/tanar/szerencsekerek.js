@@ -1,3 +1,4 @@
+import { diakokSorsolasa } from "./adatok.js";
 import { minimumJelenlevo } from "./porgetes.js";
 
 const svgNevter = "http://www.w3.org/2000/svg";
@@ -77,20 +78,9 @@ async function forgatas(tarcsa, feliratok, kezdet, cel) {
     szogBeallitasa(tarcsa, feliratok, cel % 360);
 }
 
-// Helyi próbasorsolás a #12 API elkészültéig.
-function probaNyertesek(jeloltek, darab) {
-    const maradek = jeloltek.slice();
-    const nyertesek = [];
-    while (nyertesek.length < darab) {
-        const sulyok = maradek.map(({ diak }) => Math.max(1, Number(diak.weight) || 1));
-        let huzas = Math.random() * sulyok.reduce((osszeg, suly) => osszeg + suly, 0);
-        const index = sulyok.findIndex(suly => (huzas -= suly) < 0);
-        nyertesek.push(maradek.splice(index, 1)[0]);
-    }
-    return nyertesek;
-}
-
-export function szerencsekerekLetrehozasa(panel, nyertesMegjelenitese, sorsolasMegkezdese) {
+export function szerencsekerekLetrehozasa(panel, {
+    osztalyId, nyertesMegjelenitese, sorsolasMegkezdese, uzenetMegjelenitese
+}) {
     // Osztályváltáskor a régi tárcsa leválik, így a futó animáció is leáll.
     const regiTarcsa = panel.querySelector(".kerek-szeletek");
     const tarcsa = regiTarcsa.cloneNode(false);
@@ -109,11 +99,29 @@ export function szerencsekerekLetrehozasa(panel, nyertesMegjelenitese, sorsolasM
 
         gomb.onclick = async () => {
             if (!nyertesek) {
-                const beallitasok = porgetesInditasa(szeletek.length);
+                const beallitasok = porgetesInditasa();
                 if (!beallitasok) return;
                 automatikus = beallitasok.automatikus;
-                nyertesek = probaNyertesek(szeletek, beallitasok.darab);
+                gomb.disabled = true;
                 sorsolasMegkezdese();
+                try {
+                    const diakok = await diakokSorsolasa(osztalyId, beallitasok.darab, beallitasok.hianyzok);
+                    if (!tarcsa.isConnected) return;
+                    if (diakok.length === 0) {
+                        uzenetMegjelenitese("Ma már nincs sorsolható jelenlévő tanuló.");
+                        return;
+                    }
+                    nyertesek = diakok.map(diak => szeletek.find(szelet => szelet.diak.id === diak.id));
+                    if (nyertesek.some(szelet => !szelet)) {
+                        throw new Error("A sorsolás eredménye eltér a betöltött névsortól.");
+                    }
+                } catch (hiba) {
+                    if (!tarcsa.isConnected) return;
+                    const reszlet = hiba instanceof TypeError || hiba instanceof SyntaxError
+                        ? "A szerver válasza nem érhető el." : hiba.message;
+                    uzenetMegjelenitese(`${reszlet} Válaszd ki újra az osztályt a friss névsorhoz.`);
+                    return;
+                }
             }
             gomb.disabled = true;
             do {
