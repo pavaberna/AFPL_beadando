@@ -30,11 +30,16 @@
                 <button class="menu-item" id="osztalyok-gomb" data-nezet="osztalyok">Osztályok</button>
 
             </nav>
-            <div>
-                <img class="icon" id="admin-icon" src="img/admin.png" alt="">
-                <span id="belepesi-allapot"></span>
-                <button class="btn-img" id="kijelentkezes" title="Kijelentkezés"><img class="icon" id="logout-icon"src="img/logout.png" alt=""></button>
-            </div>
+            <details id="admin-menu">
+                <summary>
+                    <img class="icon" id="admin-icon" src="img/admin.png" alt="">
+                    <span id="belepesi-allapot"></span>
+                </summary>
+                <div class="lenyilo-menu">
+                    <button type="button" class="menu-item" id="beallitasok-gomb">Beállítások</button>
+                    <button type="button" class="menu-item" data-muvelet="kijelentkezes">Kijelentkezés</button>
+                </div>
+            </details>
         </div>
     </header>
     <main id="vedett-tartalom" hidden>
@@ -42,6 +47,40 @@
             <div id="admin-tartalom">
                 Admin jogosultsággal bejelentkezve
             </div>
+
+            <dialog id="beallitasok-dialog" aria-labelledby="beallitasok-cim">
+                <h2 id="beallitasok-cim">Beállítások</h2>
+                <h3>Félévváltás</h3>
+                <p>Minden osztályban minden diák sorsolási súlya visszaáll 10-re.
+                    A sorsolási előzmények megmaradnak, így a ma már kisorsolt diákok
+                    legközelebb holnap sorsolhatók.</p>
+                <button type="button" id="felevvaltas-gomb">Súlyok visszaállítása…</button>
+                <p id="felevvaltas-eredmeny" role="status"></p>
+                <form id="tema-urlap">
+                    <label for="beallitasok-tema">Megjelenés</label>
+                    <select id="beallitasok-tema">
+                        <option value="default">Alapértelmezett</option>
+                        <option value="light">Világos</option>
+                        <option value="dark">Sötét</option>
+                        <option value="colorful">Színes</option>
+                    </select>
+                    <p id="tema-hiba" role="alert"></p>
+                    <div class="urlap-gombok">
+                        <button type="button" class="megse">Bezárás</button>
+                        <button type="submit">Megjelenés mentése</button>
+                    </div>
+                </form>
+            </dialog>
+
+            <dialog id="felevvaltas-dialog" aria-labelledby="felevvaltas-cim" aria-describedby="felevvaltas-kerdes">
+                <h2 id="felevvaltas-cim">Félévváltás</h2>
+                <p id="felevvaltas-kerdes">Visszaállítod minden diák sorsolási súlyát 10-re?</p>
+                <p id="felevvaltas-hiba" role="alert"></p>
+                <form class="urlap-gombok">
+                    <button type="button" class="megse" autofocus>Mégse</button>
+                    <button type="submit">Visszaállítás</button>
+                </form>
+            </dialog>
 
             <dialog id="tanar-dialog" aria-labelledby="tanar-dialog-cim">
                 <h2 id="tanar-dialog-cim">Új tanár felvétele</h2>

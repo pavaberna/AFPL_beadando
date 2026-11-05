@@ -269,7 +269,7 @@ dialog {
     color: var(--color-text);
 }
 dialog::backdrop {
-    background: var(--color-backdrop);
+    background-color: rgb(0 0 0 / 45%);
 }
 dialog label {
     display: block;

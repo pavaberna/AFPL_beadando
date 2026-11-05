@@ -7,6 +7,7 @@ import { dashboardTartalma } from "./admin/dashboard.js";
 import { tanarokTartalma } from "./admin/tanarok.js";
 import { osztalyokTartalma } from "./admin/osztalyok.js";
 import "./admin/diakok.js";
+import "./admin/beallitasok.js";
 
 // Az egyes menüpontokhoz tartozó műveletek.
 const nezetek = {

@@ -15,7 +15,7 @@
 
     --kerek-szelet-1: #7B828B;
     --kerek-szelet-2: #F4B943;
-    --kerek-szelet-3: #EB4830;
+    --kerek-szelet-3: #E94735;
     --kerek-felirat-3: #000;
 }
 
@@ -36,12 +36,23 @@ img#logout-icon {
     content: url("../img/logout-szines.png");
 }
 
+#top-nav,
+#top-nav .lenyilo-menu,
+#top-nav select.menu-item option {
+    background-color: var(--color-border);
+}
+
+dialog {
+    border: 3px ridge var(--color-primary);
+}
+
 dialog .urlap-gombok button[type="submit"] {
-    background-color: var(--color-success);
-    color: var(--color-background);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
 }
 dialog .urlap-gombok button[type="submit"]:hover {
-    background-color: var(--color-text);
+    background-color: var(--color-on-primary);
+    color: var(--color-primary);
 }
 [role="alert"]:not(:empty) {
     border-inline-start: 3px solid var(--color-danger);
