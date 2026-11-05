@@ -1,7 +1,9 @@
 import {
     tanarHozzaadasa,
-    tanarokLekerese
+    tanarokLekerese,
+    tanarTorlese
 } from "./adatok.js";
+import { tanarAdatlapMegnyitasa } from "./tanar-adatlap.js";
 import { htmlEscape } from "./kozos.js";
 
 
@@ -24,12 +26,12 @@ export function tanarokTartalma(tanarok) {
                     <button
                         type="button"
                         class="btn-img"
-                        data-muvelet="tanar-modositas"
+                        data-muvelet="tanar-info"
                         data-id="${htmlEscape(tanar.id)}"
-                        title="Módosítás"
-                        aria-label="Tanár módosítása"
+                        title="Tanár adatlapja"
+                        aria-label="${htmlEscape(tanar.display_name)} adatlapja"
                     >
-                        <img class="icon" src="img/update.png" alt="">
+                        <img class="icon" src="img/info.png" alt="">
                     </button>
                 </td>
 
@@ -38,6 +40,8 @@ export function tanarokTartalma(tanarok) {
                         type="button"
                         class="btn-img"
                         data-muvelet="tanar-torles"
+                        data-nev="${htmlEscape(tanar.display_name)}"
+                        data-felhasznalonev="${htmlEscape(tanar.username)}"
                         data-id="${htmlEscape(tanar.id)}"
                         title="Törlés"
                         aria-label="Tanár törlése"
@@ -85,6 +89,12 @@ export function tanarokTartalma(tanarok) {
 }
 
 
+document.addEventListener("click", event => {
+    const gomb = event.target.closest('button[data-muvelet="tanar-info"]');
+    if (gomb) tanarAdatlapMegnyitasa(Number(gomb.dataset.id));
+});
+
+
 const tanarDialog = document.querySelector("#tanar-dialog");
 const tanarUrlap = document.querySelector("#tanar-urlap");
 const tanarUrlapHiba = document.querySelector("#tanar-urlap-hiba");
@@ -104,6 +114,33 @@ document.addEventListener("click", event => {
     tanarUrlap.reset();
     tanarUrlapHiba.textContent = "";
     tanarDialog.showModal();
+});
+
+
+document.addEventListener("click", async event => {
+    const gomb = event.target.closest('button[data-muvelet="tanar-torles"]');
+    if (!gomb || gomb.disabled) return;
+
+    const { id, nev, felhasznalonev } = gomb.dataset;
+    const uzenet = `Biztosan törlöd ezt a tanárt: ${nev} (${felhasznalonev})?\n` +
+        "Az osztályai megmaradnak, de a tanár hozzárendelései megszűnnek.";
+    if (!window.confirm(uzenet)) return;
+
+    gomb.disabled = true;
+    try {
+        await tanarTorlese(Number(id));
+    } catch (hiba) {
+        alert(hiba.message || "Nem sikerült törölni a tanárt.");
+        gomb.disabled = false;
+        return;
+    }
+
+    try {
+        const tanarok = await tanarokLekerese();
+        if (gomb.isConnected) tanarokTartalma(tanarok);
+    } catch {
+        alert("A tanár törlése sikerült, de a lista nem frissült. Nyisd meg újra a Tanárok menüpontot.");
+    }
 });
 
 

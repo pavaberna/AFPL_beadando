@@ -199,11 +199,12 @@ table.card {
     padding:0;
     border: var(--border-thin);
     background-color: white;
+    margin-left: 0;
 }
 table {
     border-collapse:separate;
     border-spacing: 0;
-    width: 100%;
+    max-width: 100%;
     border-radius: var(--radius);
 }
 tr:hover td{
