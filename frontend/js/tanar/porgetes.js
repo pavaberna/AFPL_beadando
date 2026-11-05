@@ -1,64 +1,61 @@
-export function porgetesBeallitasLetrehozasa() {
-    let porgetesekSzama = 3;
+export const minimumPorgetes = 3;
 
-    const elem = document.createElement("div");
+export const minimumSorsolhato = minimumPorgetes + 1;
+
+export function porgetesBeallitasLetrehozasa() {
+    const elem = document.createElement("fieldset");
+    elem.classList.add("porgetes-beallitasok");
+
     elem.innerHTML = `
-        <p>
-            Pörgetések száma: <strong class="porgetes-ertek">3</strong>
-            <button type="button" class="modositas">Módosítás</button>
-        </p>
-        <dialog id="porgetes-dialog"aria-labelledby="porgetes-cim">
-            <h3 id="porgetes-cim">Pörgetések beállítása</h3>
-            <form>
-                <label for="porgetes-darab">Pörgetések száma</label>
-                <input id="porgetes-darab" type="number" min="3" step="1" required>
-                <button type="submit">Mentés</button>
-                <button type="button" class="megse">Mégse</button>
-            </form>
-        </dialog>
+        <legend>Pörgetés beállításai</legend>
+        <label>
+            Pörgetések száma:
+            <select id="porgetes-darab"></select>
+        </label>
+        <label hidden>
+            <input type="checkbox" id="automatikus-porgetes">
+            Összes név pörgetése egy kattintásra
+        </label>
+        <p role="status" hidden>Nincs elég diák a pörgetéshez.</p>
     `;
 
-    const ertek = elem.querySelector(".porgetes-ertek");
-    const modositas = elem.querySelector(".modositas");
-    const ablak = elem.querySelector("dialog");
-    const mezo = elem.querySelector("input");
+    const cimke = elem.querySelector("label");
+    const valaszto = elem.querySelector("select");
+    const automatikus = elem.querySelector("input");
+    const uzenet = elem.querySelector("p");
 
-    modositas.addEventListener("click", () => {
-        mezo.value = porgetesekSzama;
-        ablak.showModal();
-    });
+    function letszamBeallitasa(maximum) {
+        const kevesenVannak = maximum < minimumPorgetes;
+        const elozoErtek = Number(valaszto.value) || minimumPorgetes;
 
-    elem.querySelector(".megse").addEventListener("click", () => {
-        ablak.close();
-    });
+        cimke.hidden = kevesenVannak;
+        automatikus.parentElement.hidden = kevesenVannak;
+        valaszto.disabled = kevesenVannak;
+        uzenet.hidden = !kevesenVannak;
 
-    elem.querySelector("form").addEventListener("submit", (event) => {
-        event.preventDefault();
-        porgetesekSzama = mezo.valueAsNumber;
-        ertek.textContent = porgetesekSzama;
-        ablak.close();
-    });
+        valaszto.replaceChildren();
 
-    function letszamBeallitasa(jelenlevokSzama) {
-        const kevesenVannak = jelenlevokSzama < 3;
-        const mostKellJelezni = kevesenVannak && !modositas.disabled;
+        if (kevesenVannak) return;
 
-        modositas.disabled = kevesenVannak;
-        mezo.max = jelenlevokSzama;
-
-        if (kevesenVannak) {
-            porgetesekSzama = 3;
-            ertek.textContent = "–";
-
-            if (mostKellJelezni) {
-                alert("A pörgetéshez legalább 3 jelenlévő tanuló szükséges.");
-            }
-            return;
+        for (let darab = minimumPorgetes; darab <= maximum; darab++) {
+            valaszto.add(new Option(darab, darab));
         }
 
-        porgetesekSzama = Math.min(porgetesekSzama, jelenlevokSzama);
-        ertek.textContent = porgetesekSzama;
+        valaszto.value = Math.min(elozoErtek, maximum);
     }
 
-    return { elem, letszamBeallitasa };
+    function beallitasokRogzitese(maximum) {
+        const darab = Number(valaszto.value);
+        if (!Number.isInteger(darab) || darab < minimumPorgetes || darab > maximum) {
+            valaszto.setCustomValidity("Legalább 3 nevet válassz, és legalább egy sorsolható diák maradjon ki.");
+            valaszto.reportValidity();
+            valaszto.setCustomValidity("");
+            return null;
+        }
+        valaszto.disabled = true;
+        automatikus.disabled = true;
+        return { darab, automatikus: automatikus.checked };
+    }
+
+    return { elem, letszamBeallitasa, beallitasokRogzitese };
 }

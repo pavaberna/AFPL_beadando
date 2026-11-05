@@ -1,6 +1,6 @@
 const { test, expect } = require("@playwright/test");
 
-test("A pörgetések száma 3 és a jelenlévők száma közötti egész szám", async ({ page }) => {
+test("A pörgetések száma legalább 3, és legalább egy jelenlévő kimarad", async ({ page }) => {
     const osztaly = { id: 1, name: "9.A" };
     const diakok = ["Anna", "Béla", "Csilla", "Dénes", "Éva"].map((name, index) => ({
         id: index + 1,
@@ -25,45 +25,37 @@ test("A pörgetések száma 3 és a jelenlévők száma közötti egész szám",
     });
 
     await page.goto("/tanar.html");
-    await page.getByRole("button", { name: "9.A", exact: true }).click();
 
-    const modositas = page.getByRole("button", { name: "Módosítás" });
-    const ablak = page.getByRole("dialog");
-    const mezo = ablak.getByRole("spinbutton");
-    const mentes = ablak.getByRole("button", { name: "Mentés" });
-    const kijelzettErtek = page.locator(".porgetes-ertek");
+    const osztalyMenu = page.locator("#osztaly-menu");
 
-    await expect(kijelzettErtek).toHaveText("3");
-    await modositas.click();
+    await expect(page.locator("#tanar-tartalom table")).toHaveCount(0);
+    await osztalyMenu.locator("summary").click();
+    await osztalyMenu.getByRole("button", { name: "9.A", exact: true }).click();
 
-    // Üres, negatív, nulla, minimum alatti, tört és túl nagy érték.
-    for (const hibasErtek of ["", "-1", "0", "2", "3.5", "6"]) {
-        await mezo.fill(hibasErtek);
-        await mentes.click();
+    await expect(osztalyMenu).not.toHaveAttribute("open", "");
+    await expect(osztalyMenu.locator("summary")).toHaveText("Osztályok ▾");
 
-        await expect(ablak).toBeVisible();
-        await expect(kijelzettErtek).toHaveText("3");
-    }
+    const valaszto = page.getByLabel("Pörgetések száma:");
+    const opciok = valaszto.locator("option");
+    const uzenet = page.getByText("Nincs elég diák a pörgetéshez.", { exact: true });
 
-    // Öt jelenlévőnél pontosan öt pörgetés még menthető.
-    await mezo.fill("5");
-    await mentes.click();
-    await expect(ablak).toBeHidden();
-    await expect(kijelzettErtek).toHaveText("5");
+    await expect(page.getByRole("heading", { name: "9.A – 5 fő" })).toBeVisible();
+    await expect(opciok).toHaveText(["3", "4"]);
+    await expect(valaszto).toHaveValue("3");
+    await expect(uzenet).toBeHidden();
 
-    // Egy hiányzó után már csak négy pörgetés engedélyezett.
-    await page.getByRole("checkbox", { name: "Anna", exact: true }).check();
-    await expect(kijelzettErtek).toHaveText("4");
+    await valaszto.selectOption("4");
+    await page.getByLabel("Anna", { exact: true }).check();
 
-    await modositas.click();
-    await mezo.fill("5");
-    await mentes.click();
-    await expect(ablak).toBeVisible();
-    await expect(kijelzettErtek).toHaveText("4");
+    await expect(opciok).toHaveText(["3"]);
+    await expect(valaszto).toHaveValue("3");
 
-    // Az alsó határ is menthető.
-    await mezo.fill("3");
-    await mentes.click();
-    await expect(ablak).toBeHidden();
-    await expect(kijelzettErtek).toHaveText("3");
+    await page.getByLabel("Béla", { exact: true }).check();
+    await expect(valaszto).toBeHidden();
+    await expect(uzenet).toBeVisible();
+
+    await page.getByLabel("Béla", { exact: true }).uncheck();
+    await expect(valaszto).toBeVisible();
+    await expect(valaszto).toHaveValue("3");
+    await expect(uzenet).toBeHidden();
 });

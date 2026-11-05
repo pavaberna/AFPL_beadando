@@ -1,0 +1,45 @@
+#kerek-tartalom:not([hidden]) {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+}
+#kerek-tartalom svg {
+    width: min(100%, 26rem);
+    height: auto;
+}
+.kerek-perem, .kerek-nyil {
+    stroke: var(--color-text);
+    stroke-width: 3;
+    stroke-linejoin: round;
+}
+.kerek-perem { fill: none; }
+.kerek-nyil { fill: var(--color-text); }
+.kerek-kozep { 
+    fill: var(--color-text); 
+    stroke: var(--color-background);
+    stroke-width: 2;}
+.kerek-szeletek g {
+    fill: var(--color-primary);
+    color: var(--color-on-primary);
+}
+.kerek-szeletek g:nth-child(3n + 2) {
+    fill: var(--color-border);
+    color: var(--color-background);
+}
+.kerek-szeletek g:nth-child(3n) {
+    fill: var(--color-background);
+    color: var(--color-text);
+}
+/* Záródáskor is különbözzön az első és az utolsó szelet. */
+.kerek-szeletek g:last-child:nth-child(3n + 1) {
+    fill: var(--color-border);
+    color: var(--color-background);
+}
+.kerek-szeletek text {
+    fill: currentColor;
+    font-weight: var(--font-bold);
+}
+#kerek-porgetes:disabled {
+    opacity: .65;
+    cursor: default;
+}

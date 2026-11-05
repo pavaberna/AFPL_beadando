@@ -26,14 +26,14 @@ async function oldalMegnyitasa(page, valasz) {
 
     await page.goto("/tanar.html");
 
-    // Az osztálygomb megjelenésekor a menü kezelői már élnek.
-    await expect(page.getByRole("button", { name: "9.A", exact: true })).toBeVisible();
+    // A menü feltöltése után a Beállítások gomb már használható.
+    await expect(page.locator("#osztaly-lista button")).toHaveText("9.A");
 
     return kuldottNevek;
 }
 
 async function ablakMegnyitasa(page) {
-    await page.locator("#top-nav summary").click();
+    await page.locator("summary").filter({ has: page.locator("#belepesi-allapot") }).click();
     await page.getByRole("button", { name: "Beállítások" }).click();
 
     const ablak = page.getByRole("dialog");

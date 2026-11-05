@@ -3,12 +3,15 @@ import {
     osztalyNevsorLekerese
 } from "./tanar/adatok.js";
 
-import { osztalyokTartalma } from "./tanar/osztalyok.js";
+import { szerencsekerekLetrehozasa } from "./tanar/szerencsekerek.js";
+import { minimumSorsolhato } from "./tanar/porgetes.js";
 import { nevsorTartalma } from "./tanar/nevsor.js";
 import { beallitasokInditasa } from "./tanar/beallitasok.js";
 
 const tartalom = document.getElementById("tanar-tartalom");
-const osztalyokGomb = document.getElementById("osztalyok-gomb");
+const kerekPanel = document.getElementById("kerek-tartalom");
+const osztalyMenu = document.getElementById("osztaly-menu");
+const osztalyLista = document.getElementById("osztaly-lista");
 
 function betoltesInditasa(uzenet) {
     const hely = document.createElement("div");
@@ -17,39 +20,102 @@ function betoltesInditasa(uzenet) {
     return hely;
 }
 
-async function osztalyokMegnyitasa() {
-    const hely = betoltesInditasa("Osztályok betöltése…");
-
+async function osztalyValasztoBetoltese() {
     try {
         const osztalyok = await sajatOsztalyokLekerese();
-        hely.replaceChildren(osztalyokTartalma(osztalyok, nevsorMegnyitasa));
+
+        if (osztalyok.length === 0) {
+            tartalom.textContent = "Még nincs hozzád rendelt osztály.";
+            return;
+        }
+
+        for (const osztaly of osztalyok) {
+            const gomb = document.createElement("button");
+            gomb.type = "button";
+            gomb.classList.add("menu-item");
+            gomb.textContent = osztaly.name;
+
+            gomb.addEventListener("click", () => {
+                osztalyMenu.open = false;
+                osztalyMenu.querySelector("summary").focus();
+                nevsorMegnyitasa(osztaly);
+            });
+
+            osztalyLista.append(gomb);
+        }
+        
     } catch (hiba) {
-        hely.textContent = "Az osztályokat nem sikerült betölteni.";
+        tartalom.textContent = "Az osztályokat nem sikerült betölteni.";
         console.error(hiba);
     }
 }
 
+function kerekAllapotFrissitese(uzenet) {
+    const kerekUzenet = document.getElementById("kerek-uzenet");
+    const kerekTartalom = document.getElementById("kerek-tartalom");
+
+    kerekUzenet.textContent = uzenet;
+    kerekUzenet.hidden = uzenet === "";
+    kerekTartalom.hidden = uzenet !== "";
+}
+
 async function nevsorMegnyitasa(osztaly) {
     const hely = betoltesInditasa(`${osztaly.name} névsorának betöltése…`);
+    const eredmenyek = document.createElement("ol");
+    eredmenyek.setAttribute("aria-live", "polite");
+    function eredmenylistaMegnyitasa() {
+        const cim = document.createElement("h2");
+        cim.textContent = `${osztaly.name} – Aktuális sorsolás`;
+        hely.replaceChildren(cim, eredmenyek);
+    }
+    function nyertesMegjelenitese(diak) {
+        const sor = document.createElement("li");
+        sor.textContent = diak.name;
+        eredmenyek.append(sor);
+    }
+
+    const kerek = szerencsekerekLetrehozasa(kerekPanel, {
+        osztalyId: osztaly.id,
+        nyertesMegjelenitese,
+        sorsolasMegkezdese: eredmenylistaMegnyitasa,
+        uzenetMegjelenitese: kerekAllapotFrissitese
+    });
+    kerekAllapotFrissitese("A névsor betöltése folyamatban…");
 
     try {
         const diakok = await osztalyNevsorLekerese(osztaly.id);
-        hely.replaceChildren(nevsorTartalma(osztaly, diakok));
+
+        // Ha közben másik osztályt választottak, már annak a névsora számít.
+        if (!hely.isConnected) return;
+
+        const nevsor = nevsorTartalma(osztaly, diakok, (sorsolhatok, inditas) => {
+            if (sorsolhatok.length < minimumSorsolhato) {
+                kerekAllapotFrissitese(
+                    `Ma még sorsolható: ${sorsolhatok.length} fő. A pörgetéshez legalább ${minimumSorsolhato} fő szükséges.`
+                );
+                return;
+            }
+            kerekAllapotFrissitese("");
+            kerek(sorsolhatok, inditas);
+        });
+
+        hely.replaceChildren(nevsor);
     } catch (hiba) {
+        if (!hely.isConnected) return;
+
         hely.textContent = "A névsort nem sikerült betölteni.";
+        kerekAllapotFrissitese("A pörgetéshez előbb be kell tölteni a névsort.");
         console.error(hiba);
     }
 }
 
 export function tanariFeluletInditasa() {
-    osztalyokGomb.addEventListener("click", osztalyokMegnyitasa);
-    const menu = document.querySelector("#top-nav details");
-
-    menu.addEventListener("mouseleave", () => {
-        menu.open = false;
-    });
+    for (const menu of document.querySelectorAll("#top-nav details")) {
+        menu.addEventListener("mouseleave", () => {
+            menu.open = false;
+        });
+    }
 
     beallitasokInditasa();
-
-    return osztalyokMegnyitasa();
+    return osztalyValasztoBetoltese();
 }
