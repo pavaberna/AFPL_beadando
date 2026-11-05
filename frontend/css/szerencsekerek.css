@@ -1,3 +1,13 @@
+/* Világos téma: a fejlécben megjelenő logo-sotet.svg színei.
+   A témák :root szabályai felülírhatják az alapértékeket. */
+:where(:root) {
+    --kerek-szelet-1: #67808D;
+    --kerek-szelet-2: #EEEEEF;
+    --kerek-szelet-3: #82CAED;
+    --kerek-perem: #1D334C;
+    --kerek-felirat-3: #1D334C;
+}
+
 #kerek-tartalom:not([hidden]) {
     display: grid;
     justify-items: center;
@@ -7,33 +17,32 @@
     width: min(100%, 26rem);
     height: auto;
 }
-.kerek-perem, .kerek-nyil {
-    stroke: var(--color-text);
+.kerek-perem,
+.kerek-nyil {
+    stroke: var(--kerek-perem);
     stroke-width: 3;
     stroke-linejoin: round;
 }
 .kerek-perem { fill: none; }
-.kerek-nyil { fill: var(--color-text); }
-.kerek-kozep { 
-    fill: var(--color-text); 
-    stroke: var(--color-background);
-    stroke-width: 2;}
-.kerek-szeletek g {
-    fill: var(--color-primary);
-    color: var(--color-on-primary);
+.kerek-nyil { fill: var(--kerek-perem); }
+.kerek-kozep {
+    fill: #1D324B;
+    stroke: #EEEEEF;
+    stroke-width: 2;
 }
-.kerek-szeletek g:nth-child(3n + 2) {
-    fill: var(--color-border);
-    color: var(--color-background);
+.kerek-szeletek g {
+    fill: var(--kerek-szelet-1);
+    color: #000;
+}
+.kerek-szeletek g:nth-child(3n + 2),
+.kerek-szeletek g:last-child:nth-child(3n + 1) {
+    /* Az utolsó szelet a kör záródásakor is különbözzön az elsőtől. */
+    fill: var(--kerek-szelet-2);
+    color: #1D334C;
 }
 .kerek-szeletek g:nth-child(3n) {
-    fill: var(--color-background);
-    color: var(--color-text);
-}
-/* Záródáskor is különbözzön az első és az utolsó szelet. */
-.kerek-szeletek g:last-child:nth-child(3n + 1) {
-    fill: var(--color-border);
-    color: var(--color-background);
+    fill: var(--kerek-szelet-3);
+    color: var(--kerek-felirat-3);
 }
 .kerek-szeletek text {
     fill: currentColor;

@@ -20,6 +20,7 @@ export function beallitasokInditasa() {
     const ablak = document.getElementById("beallitasok-dialog");
     const urlap = document.getElementById("beallitasok-urlap");
     const mezo = document.getElementById("beallitasok-nev");
+    const temaMezo = document.getElementById("beallitasok-tema");
     const hibaHelye = document.getElementById("beallitasok-hiba");
     const megse = document.getElementById("beallitasok-megse");
     const mentes = urlap.querySelector('button[type="submit"]');
@@ -31,6 +32,7 @@ export function beallitasokInditasa() {
     beallitasokGomb.addEventListener("click", () => {
         beallitasokGomb.closest("details").open = false;
         mezo.value = nevHelye.textContent;
+        temaMezo.value = window.afplTema.lekeres();
         ablak.showModal();
     });
 
@@ -60,14 +62,27 @@ export function beallitasokInditasa() {
 
         if (hibaHelye.textContent) return;
 
+        const tema = temaMezo.value;
         mentesFolyamatban = true;
+        mezo.disabled = true;
+        temaMezo.disabled = true;
         mentes.disabled = true;
         megse.disabled = true;
 
         try {
-            const { user } = await nevModositasa(nev);
+            if (nev !== nevHelye.textContent) {
+                const { user } = await nevModositasa(nev);
+                nevHelye.textContent = user.display_name;
+            }
 
-            nevHelye.textContent = user.display_name;
+            if (tema !== window.afplTema.lekeres()) {
+                try {
+                    window.afplTema.mentes(tema);
+                } catch {
+                    hibaHelye.textContent = "A témát nem sikerült elmenteni ebben a böngészőben.";
+                    return;
+                }
+            }
             ablak.close();
         } catch (hiba) {
             // A status nélküli hiba (pl. hálózati) üzenete a felhasználónak nem mond semmit.
@@ -77,6 +92,8 @@ export function beallitasokInditasa() {
             console.error(hiba);
         } finally {
             mentesFolyamatban = false;
+            mezo.disabled = false;
+            temaMezo.disabled = false;
             mentes.disabled = false;
             megse.disabled = false;
         }

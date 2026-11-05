@@ -1,0 +1,56 @@
+:root {
+    color-scheme: light;
+    --color-background: #F1F1F1;
+    --color-surface: #F1F1F1;
+    --color-text: #20354B;
+    --color-primary: #F2BC46;
+    --color-on-primary: var(--color-text);
+    --color-border: #7B8790;
+    --color-nav-background: var(--color-text);
+    --color-nav-text: var(--color-background);
+    --color-success: #287568;
+    --color-danger: #E94735;
+    --radius: 8px;
+    --gap: 24px;
+
+    --kerek-szelet-1: #7B828B;
+    --kerek-szelet-2: #F4B943;
+    --kerek-szelet-3: #EB4830;
+    --kerek-felirat-3: #000;
+}
+
+#top-header .logo {
+    content: url("../img/logo-szines.svg");
+}
+
+img#teacher-icon {
+    content: url("../img/teacher-szines.png");
+}
+img#user-icon {
+    content: url("../img/user-szines.png");
+}
+img#admin-icon {
+    content: url("../img/admin-szines.png");
+}
+img#logout-icon {
+    content: url("../img/logout-szines.png");
+}
+
+dialog .urlap-gombok button[type="submit"] {
+    background-color: var(--color-success);
+    color: var(--color-background);
+}
+dialog .urlap-gombok button[type="submit"]:hover {
+    background-color: var(--color-text);
+}
+[role="alert"]:not(:empty) {
+    border-inline-start: 3px solid var(--color-danger);
+    padding-inline-start: 0.75rem;
+}
+:focus-visible {
+    outline: 3px solid var(--color-text);
+    outline-offset: 2px;
+}
+#top-nav :focus-visible {
+    outline-color: var(--color-primary);
+}

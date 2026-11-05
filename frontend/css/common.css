@@ -1,9 +1,13 @@
 :root {
+    color-scheme: light;
     --color-background: #F1F1F1;
+    --color-surface: #fff;
     --color-text: #20354b;
     --color-primary: #87CEEB;
     --color-on-primary: #20354B;
     --color-border: #607c8a;
+    --color-nav-background: var(--color-text);
+    --color-nav-text: var(--color-background);
     --color-success: #287568;
     --color-danger: #B84A3A;
     --color-shadow: #20354b80;
@@ -136,15 +140,15 @@ button.btn-img:hover img {
   justify-content: space-between;
 }
 #top-nav {
-    background-color: var(--color-text);
-    color: var(--color-background);
+    background-color: var(--color-nav-background);
+    color: var(--color-nav-text);
 }
 #top-nav .flex-x {
     justify-content: space-between;
     align-items: center;
 }
 #top-nav button {
-    color: var(--color-background);
+    color: var(--color-nav-text);
     padding: 5px 15px 5px 0px;
     border:none;
     background: transparent;
@@ -152,8 +156,8 @@ button.btn-img:hover img {
     font-variant: small-caps;
 }
 #top-nav select.menu-item option {
-    background-color: var(--color-text);
-    color: var(--color-background);
+    background-color: var(--color-nav-background);
+    color: var(--color-nav-text);
 }
 #top-nav button:hover
 {
@@ -213,7 +217,7 @@ form button {
 table.card {
     padding:0;
     border: var(--border-thin);
-    background-color: white;
+    background-color: var(--color-surface);
     margin-left: 0;
 }
 table {
@@ -254,48 +258,39 @@ tr:last-of-type td:last-of-type {
 
 
 /* dialog ablak */
-#beallitasok-dialog,
-#porgetes-dialog,
-#tanar-dialog,
-#osztaly-dialog,
-#diak-dialog {
+/* dialog ablak */
+dialog {
     width: min(28rem, 90vw);
-    box-sizing: border-box;
     padding: 1.5rem;
-    border: none;
+    border: var(--border-thin);
     border-radius: 0.75rem;
-    margin:auto;
+    margin: auto;
+    background-color: var(--color-surface);
+    color: var(--color-text);
 }
-#beallitasok-dialog::backdrop,
-#porgetes-dialog::backdrop,
-#tanar-dialog::backdrop,
-#osztaly-dialog::backdrop,
-#diak-dialog::backdrop {
-    background: rgb(0 0 0 / 50%);
+dialog::backdrop {
+    background: var(--color-backdrop);
 }
-#beallitasok-dialog label,
-#porgetes-dialog label,
-#tanar-urlap label,
-#osztaly-urlap label
-#diak-dialog label {
+dialog label {
     display: block;
     margin-bottom: 0.4rem;
 }
-#beallitasok-dialog input,
-#porgetes-dialog input,
-#tanar-urlap input,
-#osztaly-urlap input,
-#diak-dialog input {
+dialog input:not([type="checkbox"]):not([type="radio"]),
+dialog select {
     width: 100%;
-    box-sizing: border-box;
 }
+
 .urlap-gombok {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
+}
+.urlap-gombok > button[type="submit"] {
+    order: -1;
 }
 .megse {
     background-color: transparent;
     color: inherit;
     border-color: currentColor;
 }
+
