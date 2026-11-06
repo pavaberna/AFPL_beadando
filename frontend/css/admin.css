@@ -54,3 +54,44 @@ td:nth-child(5) {
     margin: 0.75rem 0;
     overflow-wrap: anywhere;
 }
+
+#top-nav #admin-menu {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#admin-menu summary {
+    display:flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+#admin-menu .lenyilo-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    z-index: 10;
+    background-color: var(--color-nav-background);
+    border-radius: 0 0 5px 5px;
+    padding-top: 20px;
+}
+#admin-menu .lenyilo-menu button{
+    padding: 10px 20px;
+    width: max-content;
+    font-weight: normal;
+    font-size: 80%;
+}
+
+#felevvaltas-gomb {
+    margin-block: 0.75rem;
+}
+#tema-urlap {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: var(--border-thin);
+}
+#tema-urlap label {
+    margin: 0 0 0.4rem;
+    font-weight: bold;
+}

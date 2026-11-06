@@ -150,6 +150,7 @@ function nevsorMegnyitasa(osztalyId) {
         return tanarok.filter(t => !azonositok.has(Number(t.id)));
     }
 
+    panel.classList.add("osztaly-nevsor");
     panel.addEventListener("nevsor-frissites", frissites);
     panel.addEventListener("click", async event => {
         const gomb = event.target.closest("button[data-muvelet]");

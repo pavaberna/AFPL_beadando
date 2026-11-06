@@ -236,3 +236,63 @@ test("A tanárfelvételi ablak megnyitható és bezárható", async ({ page }) =
     await page.keyboard.press("Escape");
     await expect(ablak).not.toBeVisible();
 });
+
+async function beallitasokMegnyitasa(page) {
+    await page.getByText("Teszt Admin", { exact: true }).click();
+    await page.getByRole("button", { name: "Beállítások" }).click();
+    return page.getByRole("dialog", { name: "Beállítások" });
+}
+
+test("Az admin témaválasztása újratöltés után is érvényes", async ({ page }) => {
+    const ablak = await beallitasokMegnyitasa(page);
+    await ablak.getByLabel("Megjelenés").selectOption("colorful");
+    await ablak.getByRole("button", { name: "Megjelenés mentése" }).click();
+    await page.reload();
+    await beallitasokMegnyitasa(page);
+    await expect(ablak.getByLabel("Megjelenés")).toHaveValue("colorful");
+    await expect(page.locator('link[href$="tema-szines.css"]')).toHaveAttribute("media", "all");
+});
+
+test("Félévváltáskor csak megerősítésre indul a POST, és látszik a létszám", async ({ page }) => {
+    const ablak = await beallitasokMegnyitasa(page);
+    const inditas = ablak.getByRole("button", { name: "Súlyok visszaállítása…" });
+    const kerdes = page.getByRole("dialog", { name: "Félévváltás" });
+    await inditas.click();
+    await kerdes.getByRole("button", { name: "Mégse" }).click();
+    await expect(kerdes).toBeHidden();
+
+    const keresek = [];
+    await page.route("**/admin/reset-weights.php", route => {
+        keresek.push([route.request().method(), route.request().postData()]);
+        return route.fulfill({ json: { ok: true, reset_count: 8 } });
+    });
+    await inditas.click();
+    await kerdes.getByRole("button", { name: "Visszaállítás", exact: true }).click();
+    await expect(ablak.getByRole("status")).toContainText("Érintett diákok száma: 8.");
+    expect(keresek).toEqual([["POST", null]]);
+});
+
+test("Sikertelen félévváltás után az admin látja a hibát és bezárhatja az ablakot", async ({ page }) => {
+    await page.route("**/admin/reset-weights.php", route => route.fulfill({
+        status: 403, json: { error: "Admin jogosultság szükséges." }
+    }));
+    const ablak = await beallitasokMegnyitasa(page);
+    await ablak.getByRole("button", { name: "Súlyok visszaállítása…" }).click();
+    const kerdes = page.getByRole("dialog", { name: "Félévváltás" });
+    await kerdes.getByRole("button", { name: "Visszaállítás", exact: true }).click();
+    await expect(kerdes.getByRole("alert")).toHaveText("Admin jogosultság szükséges.");
+    await kerdes.getByRole("button", { name: "Mégse" }).click();
+    await expect(ablak.getByRole("status")).toBeEmpty();
+});
+
+test("Az admin a neve alatti menüből jelentkezhet ki", async ({ page }) => {
+    const kilepes = page.getByRole("button", { name: "Kijelentkezés" });
+    await expect(kilepes).toBeHidden();
+    await page.getByText("Teszt Admin", { exact: true }).click();
+    await page.route("**/backend/public/logout.php", route => {
+        expect(route.request().method()).toBe("POST");
+        return route.fulfill({ json: { ok: true } });
+    });
+    await kilepes.click();
+    await expect(page).toHaveURL("http://127.0.0.1:4173/");
+});
