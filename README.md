@@ -140,3 +140,5 @@ A szkript futásonként egy mentést készít, a napi futtatást ütemezővel ke
 A régi mentések nem törlődnek automatikusan. A mentések jelszóhasheket is tartalmaznak, ezért nem kerülhetnek nyilvánosan elérhető helyre. A `.gitignore` miatt a repóba sem kerülnek be.
 
 Visszaállítás: amíg az alkalmazás nem kap kéréseket, a kiválasztott mentést kell a `database/database.sqlite` helyére másolni.
+
+Showcase
