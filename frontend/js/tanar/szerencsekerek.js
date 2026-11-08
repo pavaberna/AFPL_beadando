@@ -62,8 +62,7 @@ function szogBeallitasa(tarcsa, feliratok, fok) {
 }
 
 async function forgatas(tarcsa, feliratok, kezdet, cel) {
-    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        const indulas = performance.now();
+    const indulas = performance.now();
         await new Promise(befejez => {
             function kepkocka(ido) {
                 if (!tarcsa.isConnected) return befejez();
@@ -74,7 +73,6 @@ async function forgatas(tarcsa, feliratok, kezdet, cel) {
             }
             requestAnimationFrame(kepkocka);
         });
-    }
     szogBeallitasa(tarcsa, feliratok, cel % 360);
 }
 
